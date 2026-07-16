@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="my" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>အဖွဲ့ဝင် ၁၀ ဦး အသုံးစရိတ် စာရင်း</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CSS Config for Custom Colors & Fonts -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            900: '#14532d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Chart.js for beautiful analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts for Myanmar Unicode -->
+    <link href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&family=Kohit&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Padauk', 'Kohit', sans-serif;
+            background: radial-gradient(circle at top, #1e293b, #0f172a);
+        }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen pb-12 antialiased">
+
+    <!-- Top Navigation Bar -->
+    <nav class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50 px-4 py-3">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-green-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                    <span class="text-white font-bold text-xl">💸</span>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold tracking-wide">အဖွဲ့ဝင် (၁၀) ဦး အသုံးစရိတ်</h1>
+                    <p class="text-xs text-slate-400">နေ့စဉ် စာရင်းထိန်းသိမ်းမှုစနစ်</p>
+                </div>
+            </div>
+            
+            <!-- Admin Authorization Button -->
+            <button id="adminBtn" onclick="toggleAdminMode()" class="px-4 py-2 text-xs font-semibold rounded-xl transition-all duration-200 border border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center gap-2">
+                <span id="lockIcon">🔒</span> <span id="adminBtnText">Admin ဝင်မည်</span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-4 mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Left Column: Summary Cards & Input Form -->
+        <div class="lg:col-span-1 flex flex-col gap-6">
+            
+            <!-- Summary Card 1: Total Cost -->
+            <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-800 p-6 shadow-xl">
+                <div class="absolute right-0 top-0 -mt-4 -mr-4 w-24 h-24 bg-emerald-500/10 rounded-full blur-xl"></div>
+                <p class="text-sm text-slate-400">စုစုပေါင်း ကုန်ကျစရိတ်</p>
+                <h3 class="text-3xl font-extrabold text-emerald-400 mt-2" id="totalExpense">၀ ကျပ်</h3>
+                <div class="mt-4 pt-4 border-t border-slate-800/80 flex justify-between text-xs text-slate-400">
+                    <span>တစ်ယောက်ချင်းစီ ကျသင့်ငွေ:</span>
+                    <span class="font-semibold text-slate-200" id="perPersonExpense">၀ ကျပ်</span>
+                </div>
+            </div>
+
+            <!-- Admin Only: Input Form (Hidden by default) -->
+            <div id="adminFormCard" class="hidden rounded-2xl bg-slate-900/50 backdrop-blur-md border border-emerald-500/30 p-6 shadow-xl transition-all duration-300">
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="text-emerald-400">📝</span>
+                    <h2 class="text-base font-bold text-slate-100">အသုံးစရိတ်အသစ် ထည့်သွင်းရန်</h2>
+                </div>
+                
+                <form id="expenseForm" onsubmit="saveExpense(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1.5">ရက်စွဲ</label>
+                        <input type="date" id="expDate" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-slate-100 focus:outline-none focus:border-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1.5">အသုံးပြုသည့် အကြောင်းအရာ</label>
+                        <input type="text" id="expTitle" placeholder="ဥပမာ - နေ့လည်စာ စားစရိတ်" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1.5">ကျသင့်ငွေ (ကျပ်)</label>
+                        <input type="number" id="expAmount" placeholder="ဥပမာ - ၁၅၀၀၀" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500">
+                    </div>
+                    <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 active:scale-95 transition text-slate-950 font-bold text-sm py-2.5 rounded-xl shadow-lg shadow-emerald-500/20">
+                        သိမ်းဆည်းမည်
+                    </button>
+                </form>
+            </div>
+
+            <!-- Default Notice for view-only users -->
+            <div id="visitorNotice" class="rounded-2xl bg-slate-900/40 border border-slate-800/80 p-5 text-center text-xs text-slate-400">
+                စာရင်းများကို အချိန်မရွေး တိုက်ရိုက် ကြည့်ရှုနိုင်ပါသည်။
+            </div>
+
+        </div>
+
+        <!-- Right Column: Visual Analytics & Historical List -->
+        <div class="lg:col-span-2 flex flex-col gap-6">
+            
+            <!-- Visual Chart Card -->
+            <div class="rounded-2xl bg-slate-900/50 border border-slate-800 p-6 shadow-xl">
+                <h3 class="text-sm font-bold text-slate-300 mb-4 flex items-center gap-2">
+                    📊 <span>နေ့စဉ် အသုံးစရိတ် လှုပ်ရှားမှုပြဇယား</span>
+                </h3>
+                <div class="h-64">
+                    <canvas id="expenseChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Expense List Table -->
+            <div class="rounded-2xl bg-slate-900/50 border border-slate-800 p-6 shadow-xl overflow-hidden">
+                <div class="flex flex-wrap justify-between items-center gap-2 mb-4">
+                    <h3 class="text-sm font-bold text-slate-300 flex items-center gap-2">
+                        📜 <span>အသုံးစရိတ်မှတ်တမ်းများ</span>
+                    </h3>
+                    <div>
+                        <span class="text-xs bg-slate-800 text-slate-400 px-2.5 py-1 rounded-full border border-slate-700" id="recordCount">၀ ခု</span>
+                    </div>
+                </div>
+
+                <!-- Responsive Table Wrapper -->
+                <div class="overflow-x-auto" id="expense-table-container">
+                    <table class="w-full text-left text-sm text-slate-300 border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-800 text-slate-400 text-xs uppercase tracking-wider bg-slate-800/30">
+                                <th class="py-3 px-4 font-semibold">ရက်စွဲ</th>
+                                <th class="py-3 px-4 font-semibold">အကြောင်းအရာ</th>
+                                <th class="py-3 px-4 font-semibold text-right">ကျသင့်ငွေ</th>
+                                <th class="py-3 px-4 font-semibold text-center admin-action hidden">လုပ်ဆောင်ချက်</th>
+                            </tr>
+                        </thead>
+                        <tbody id="expenseTableBody" class="divide-y divide-slate-800/50">
+                            <!-- Items dynamically load here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
+    <script>
+        // --- ၁။ Firebase Configuration ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBiLX6RXHbI9bY-DA_ATyXoVgG_bedSu-4",
+            authDomain: "my-group-project4.firebaseapp.com",
+            databaseURL: "https://my-group-project4-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "my-group-project4",
+            storageBucket: "my-group-project4.firebasestorage.app",
+            messagingSenderId: "175584052486",
+            appId: "1:175584052486:web:39c54448db1b9dd872ca87"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // --- ၂။ Global App Variables ---
+        let isAdmin = false;
+        let expensesData = [];
+        let expenseChartInstance = null;
+        
+        const ADMIN_PASSWORD = "205428"; 
+
+        document.getElementById('expDate').valueAsDate = new Date();
+
+        // --- ၃။ Number Converter ---
+        function toMyanmarNumbers(num) {
+            const mmNumbers = ['၀', '၁', '၂', '၃', '၄', '၅', '၆', '၇', '၈', '၉'];
+            return num.toString().replace(/[0-9]/g, function (w) {
+                return mmNumbers[+w];
+            });
+        }
+
+        function formatMyanmarCurrency(amount) {
+            const formattedNum = Number(amount).toLocaleString('en-US');
+            return toMyanmarNumbers(formattedNum) + " ကျပ်";
+        }
+
+        // --- ၄။ Load Data from Firebase ---
+        db.ref('expenses').on('value', (snapshot) => {
+            const data = snapshot.val();
+            expensesData = [];
+            if (data) {
+                for (let key in data) {
+                    expensesData.push({ id: key, ...data[key] });
+                }
+                expensesData.sort((a, b) => new Date(b.date) - new Date(a.date));
+            }
+            updateDashboard();
+        });
+
+        // --- ၅။ Update UI Elements & Chart ---
+        function updateDashboard() {
+            const tbody = document.getElementById('expenseTableBody');
+            tbody.innerHTML = '';
+
+            let total = 0;
+            const chartData = {};
+
+            if (expensesData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="py-8 text-center text-slate-500 text-xs">စာရင်းသွင်းထားသည်များ မရှိသေးပါ။</td></tr>`;
+            } else {
+                expensesData.forEach(item => {
+                    total += Number(item.amount);
+                    chartData[item.date] = (chartData[item.date] || 0) + Number(item.amount);
+
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-slate-800/40 transition-colors duration-150 border-b border-slate-800/30";
+                    tr.innerHTML = `
+                        <td class="py-3 px-4 text-xs text-slate-400 font-medium">${toMyanmarNumbers(item.date)}</td>
+                        <td class="py-3 px-4 font-semibold text-slate-200">${item.title}</td>
+                        <td class="py-3 px-4 text-right font-extrabold text-emerald-400">${formatMyanmarCurrency(item.amount)}</td>
+                        <td class="py-3 px-4 text-center admin-action ${isAdmin ? '' : 'hidden'}">
+                            <button onclick="deleteExpense('${item.id}')" class="text-red-400 hover:text-red-300 font-bold text-xs bg-red-500/10 hover:bg-red-500/20 px-2 py-1 rounded transition">
+                                ဖျက်ရန်
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            document.getElementById('totalExpense').innerText = formatMyanmarCurrency(total);
+            document.getElementById('perPersonExpense').innerText = formatMyanmarCurrency(Math.round(total / 10));
+            document.getElementById('recordCount').innerText = toMyanmarNumbers(expensesData.length) + " ခု";
+
+            updateChart(chartData);
+        }
+
+        // --- ၆။ Chart Rendering (ဒီဇိုင်းအသစ်မြှင့်တင်မှု) ---
+        function updateChart(chartData) {
+            const sortedDates = Object.keys(chartData).sort((a, b) => new Date(a) - new Date(b));
+            const chartLabels = sortedDates.map(d => toMyanmarNumbers(d));
+            const chartValues = sortedDates.map(d => chartData[d]);
+
+            if (expenseChartInstance) {
+                expenseChartInstance.destroy();
+            }
+
+            const ctx = document.getElementById('expenseChart').getContext('2d');
+            
+            // Background Gradient အတွက် သတ်မှတ်ချက်
+            const gradient = ctx.createLinearGradient(0, 0, 0, 250);
+            gradient.addColorStop(0, 'rgba(34, 197, 94, 0.35)');
+            gradient.addColorStop(1, 'rgba(34, 197, 94, 0.00)');
+
+            expenseChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: chartLabels,
+                    datasets: [{
+                        label: 'နေ့စဉ်သုံးစရိတ်',
+                        data: chartValues,
+                        borderColor: '#22c55e',
+                        backgroundColor: gradient,
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.35,
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        pointBackgroundColor: '#22c55e',
+                        pointBorderColor: '#0f172a',
+                        pointBorderWidth: 2,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1e293b',
+                            titleColor: '#94a3b8',
+                            bodyColor: '#22c55e',
+                            bodyFont: { weight: 'bold' },
+                            borderColor: '#334155',
+                            borderWidth: 1,
+                            padding: 10,
+                            displayColors: false
+                        }
+                    },
+                    scales: {
+                        y: { 
+                            grid: { color: 'rgba(255,255,255,0.06)' }, 
+                            ticks: { color: '#94a3b8', font: { size: 10 } } 
+                        },
+                        x: { 
+                            grid: { display: false }, 
+                            ticks: { color: '#94a3b8', font: { size: 10 } } 
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- ၇။ Admin Mode Toggle ---
+        function toggleAdminMode() {
+            if (!isAdmin) {
+                let pass = prompt("Admin Password ကို ရိုက်ထည့်ပါ -");
+                if (pass !== null) {
+                    pass = pass.trim();
+                    if (pass === ADMIN_PASSWORD || Number(pass) === 205428) {
+                        isAdmin = true;
+                        alert("Admin အဖြစ် ဝင်ရောက်မှု အောင်မြင်ပါသည်။");
+                        
+                        document.getElementById('adminBtn').classList.replace('bg-slate-800', 'bg-emerald-500');
+                        document.getElementById('adminBtn').classList.replace('text-slate-300', 'text-slate-950');
+                        document.getElementById('lockIcon').innerText = "🔓";
+                        document.getElementById('adminBtnText').innerText = "Admin ဝင်ထားသည်";
+                        
+                        document.getElementById('adminFormCard').classList.remove('hidden');
+                        document.getElementById('visitorNotice').classList.add('hidden');
+                        
+                        document.querySelectorAll('.admin-action').forEach(el => el.classList.remove('hidden'));
+                    } else {
+                        alert("လျှို့ဝှက်နံပါတ် မှားယွင်းနေပါသည်။");
+                    }
+                }
+            } else {
+                isAdmin = false;
+                document.getElementById('adminBtn').classList.replace('bg-emerald-500', 'bg-slate-800');
+                document.getElementById('adminBtn').classList.replace('text-slate-950', 'text-slate-300');
+                document.getElementById('lockIcon').innerText = "🔒";
+                document.getElementById('adminBtnText').innerText = "Admin ဝင်မည်";
+                
+                document.getElementById('adminFormCard').classList.add('hidden');
+                document.getElementById('visitorNotice').classList.remove('hidden');
+                
+                document.querySelectorAll('.admin-action').forEach(el => el.classList.add('hidden'));
+            }
+        }
+
+        // --- ၈။ Add & Save to Database ---
+        function saveExpense(e) {
+            e.preventDefault();
+            if (!isAdmin) return alert("Admin သာလျှင် စာရင်းသွင်းခွင့်ရှိသည်။");
+
+            const date = document.getElementById('expDate').value;
+            const title = document.getElementById('expTitle').value;
+            const amount = document.getElementById('expAmount').value;
+
+            if (!date || !title || !amount) return;
+
+            db.ref('expenses').push({
+                date: date,
+                title: title,
+                amount: Number(amount)
+            }).then(() => {
+                document.getElementById('expTitle').value = '';
+                document.getElementById('expAmount').value = '';
+                document.getElementById('expDate').valueAsDate = new Date();
+            }).catch(err => {
+                alert("ဒေတာသိမ်းရန် အမှားတစ်ခု ဖြစ်ပေါ်ခဲ့သည်: " + err.message);
+            });
+        }
+
+        // --- ၉။ Delete Entry ---
+        function deleteExpense(id) {
+            if (!isAdmin) return alert("Admin သာလျှင် ဖျက်ပိုင်ခွင့်ရှိသည်။");
+            if (confirm("ဤအသုံးစရိတ်ကို ဖျက်ရန် သေချာပါသလား?")) {
+                db.ref('expenses/' + id).remove();
+            }
+        }
+    </script>
+</body>
+</html>
