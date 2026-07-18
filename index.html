@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SaaS Expense Analytics Dashboard</title>
+    <title>Enterprise Analytics & Expense Management System</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -13,15 +13,15 @@
                 extend: {
                     colors: {
                         slate: {
-                            950: '#030712',
-                            900: '#0b0f19',
-                            800: '#1f293d',
+                            950: '#060b13',
+                            900: '#0f172a',
+                            800: '#1e293b',
                             700: '#334155'
                         },
-                        emerald: {
-                            400: '#34d399',
-                            500: '#10b981',
-                            650: '#059669'
+                        brand: {
+                            500: '#0284c7',
+                            600: '#0369a1',
+                            glow: 'rgba(2, 132, 199, 0.15)'
                         }
                     }
                 }
@@ -31,195 +31,252 @@
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Padauk:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Padauk:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Plus Jakarta Sans', 'Padauk', sans-serif;
-            background: linear-gradient(135deg, #030712 0%, #080f1e 50%, #0c182e 100%);
+            background-color: #060b13;
         }
-        .glass-panel {
-            background: rgba(15, 23, 42, 0.45);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.04);
+        .statista-panel {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
-        .active-sidebar-item {
-            background: linear-gradient(90deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.02) 100%);
-            border-left: 3px solid #10b981;
-            color: #34d399;
+        .active-nav {
+            background-color: #0284c7;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
         }
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 5px; height: 5px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #1f293d; border-radius: 99px; }
+        /* Custom Scrollbar styled for analytics */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #060b13; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 99px; }
         ::-webkit-scrollbar-thumb:hover { background: #334155; }
     </style>
 </head>
-<body class="text-slate-100 min-h-screen antialiased flex flex-col lg:flex-row overflow-x-hidden">
+<body class="text-slate-100 min-h-screen antialiased flex flex-col">
 
-    <!-- SIDEBAR NAVIGATION -->
-    <aside class="w-full lg:w-64 bg-slate-950/80 border-b lg:border-b-0 lg:border-r border-slate-800/60 backdrop-blur-xl flex flex-col p-5 sticky top-0 z-40 lg:h-screen">
-        <!-- Logo Header -->
-        <div class="flex items-center gap-3 mb-8">
-            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+    <!-- TOP GLOBAL NAVIGATION BAR (Statista Premium Design) -->
+    <nav class="border-b border-slate-800/80 bg-slate-950/90 backdrop-blur-md sticky top-0 z-50 px-6 py-3.5 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-500 to-blue-600 flex items-center justify-center shadow-lg shadow-sky-500/20">
                 <span class="text-white font-bold text-lg">📊</span>
             </div>
             <div>
-                <h1 class="text-sm font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">EXPENSE HUB</h1>
-                <p class="text-[10px] text-emerald-400 font-semibold tracking-widest uppercase">V2 PRO SYSTEM</p>
+                <h1 class="text-sm font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">STAT-DATA PRO</h1>
+                <p class="text-[9px] text-sky-400 font-bold tracking-widest uppercase">Enterprise Analytics</p>
             </div>
         </div>
 
-        <!-- Navigation Menu Items -->
-        <nav class="flex flex-row lg:flex-col gap-1 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0 border-b border-slate-800/50 lg:border-b-0">
-            <button onclick="switchView('dashboard-view')" id="nav-dashboard-view" class="active-sidebar-item flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-200 hover:text-emerald-400 w-full text-left">
-                <span>📈</span> ခြုံငုံသုံးသပ်ချက် ပြဇယား
-            </button>
-            <button onclick="switchView('input-view')" id="nav-input-view" class="flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold text-slate-400 whitespace-nowrap transition-all duration-200 hover:text-emerald-400 w-full text-left">
-                <span>📝</span> အသုံးစရိတ်အသစ် သွင်းရန်
-            </button>
-            <button onclick="switchView('archive-view')" id="nav-archive-view" class="flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold text-slate-400 whitespace-nowrap transition-all duration-200 hover:text-emerald-400 w-full text-left">
-                <span>📁</span> သိမ်းဆည်းထားသောဖိုင်များ
-            </button>
-        </nav>
-
-        <!-- Sidebar Footer Action (Admin Space) -->
-        <div class="mt-auto pt-4 hidden lg:block border-t border-slate-900">
-            <div class="rounded-xl bg-slate-900/50 p-3 border border-slate-800/40 flex items-center justify-between">
-                <div class="truncate mr-2">
-                    <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Access Level</p>
-                    <p id="sidebarAdminStatus" class="text-xs font-semibold text-slate-400 truncate">Visitor Mode</p>
-                </div>
-                <button id="adminBtn" onclick="openAuthModal()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 flex items-center justify-center transition border border-slate-700">
-                    <span id="lockIcon">🔒</span>
-                </button>
-            </div>
+        <!-- Global Search Bar (Statista Style Integration) -->
+        <div class="hidden md:flex items-center bg-slate-900 border border-slate-700/60 rounded-xl px-3 py-1.5 w-96 gap-2 focus-within:border-sky-500 transition-all duration-150">
+            <span class="text-slate-500 text-xs">🔍</span>
+            <input type="text" id="globalSearch" oninput="handleGlobalSearch()" placeholder="အကြောင်းအရာ သို့မဟုတ် ရက်စွဲဖြင့် စစ်ထုတ်ရှာဖွေပါ..." class="bg-transparent text-xs text-slate-200 outline-none w-full placeholder-slate-600">
         </div>
-    </aside>
 
-    <!-- MAIN CONTENT CONTAINER -->
-    <div class="flex-1 flex flex-col min-w-0 max-h-screen overflow-y-auto">
+        <!-- System View Mode Controller -->
+        <div class="flex items-center gap-2">
+            <span id="roleBadge" class="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-slate-400">Viewer View</span>
+            <button id="authTriggerBtn" onclick="openAuthModal()" class="px-4 py-1.5 text-xs font-bold rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 transition flex items-center gap-1.5">
+                <span id="lockIcon">🔒</span> <span id="authBtnText">Admin Workspace</span>
+            </button>
+        </div>
+    </nav>
+
+
+    <!-- ========================================== -->
+    <!-- ၁။ ကြည့်ရှုသူ စာမျက်နှာ (VIEWER VIEW CONTAINER) -->
+    <!-- ========================================== -->
+    <div id="viewer-root-view" class="flex-1 w-full max-w-7xl mx-auto p-4 md:p-6 space-y-6">
         
-        <!-- TOP CONTROLLER HEADER BAR -->
-        <header class="glass-panel sticky top-0 z-30 px-6 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <!-- Header Controls (Google Analytics Style Filtering) -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-900 pb-4">
             <div>
-                <div class="flex items-center gap-2">
-                    <h2 id="view-title" class="text-lg font-bold tracking-tight text-white">ဒေတာ ခြုံငုံသုံးသပ်ချက်</h2>
-                    <span id="archiveLabel" class="hidden text-[10px] tracking-wide font-extrabold px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 uppercase animate-pulse">စာရင်းဟောင်း</span>
+                <h2 class="text-lg font-extrabold text-white">အသုံးစရိတ် ကိန်းဂဏန်း ခွဲခြမ်းစိတ်ဖြာမှု ပြဇယား</h2>
+                <p class="text-xs text-slate-400">Real-time Public Data Feeds</p>
+            </div>
+            <!-- Archive File Dynamic Dropdown Selector -->
+            <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                <span class="text-xs text-slate-500 font-medium">စာရင်းဖိုင် ရွေးချယ်ရန်:</span>
+                <select id="viewerArchiveSelector" onchange="handleViewerFileChange(this)" class="bg-slate-900 border border-slate-800 text-xs text-slate-300 rounded-xl px-3 py-2 outline-none focus:border-sky-500 transition">
+                    <option value="active">လတ်တလော စာရင်း</option>
+                    <!-- Dynamically injected from Database -->
+                </select>
+            </div>
+        </div>
+
+        <!-- Metric Analytics Cards Section -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div class="statista-panel rounded-2xl p-5 shadow-xl relative overflow-hidden group">
+                <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">စုစုပေါင်း သုံးစွဲမှုပမာဏ</p>
+                <h3 class="text-3xl font-black text-sky-400 mt-2 tracking-tight" id="v-totalExpense">၀ ကျပ်</h3>
+                <span class="text-[10px] text-slate-500 mt-1 block">အခြေခံ တွက်ချက်ထားသော စုစုပေါင်းမှတ်တမ်း</span>
+            </div>
+            <div class="statista-panel rounded-2xl p-5 shadow-xl relative overflow-hidden group">
+                <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">တစ်ဦးလျှင် ကျသင့်ငွေ (၁၀ ဦးနှုန်း)</p>
+                <h3 class="text-3xl font-black text-slate-100 mt-2 tracking-tight" id="v-perPersonExpense">၀ ကျပ်</h3>
+                <span class="text-[10px] text-slate-500 mt-1 block">စုစုပေါင်းမှ တစ်ဦးချင်း မျှဝေကျသင့်ငွေ</span>
+            </div>
+            <div class="statista-panel rounded-2xl p-5 shadow-xl relative overflow-hidden group">
+                <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">စုစုပေါင်း အချက်အလက် (Data Rows)</p>
+                <h3 class="text-3xl font-black text-slate-100 mt-2 tracking-tight" id="v-recordCount">၀ ခု</h3>
+                <span class="text-[10px] text-slate-500 mt-1 block">စနစ်တွင်းရှိ အသုံးစရိတ် ကဏ္ဍစုစုပေါင်း</span>
+            </div>
+        </div>
+
+        <!-- Graphic Analytics Core Charts (TradingView/GA4 Visual Integration) -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 statista-panel rounded-2xl p-5 shadow-2xl">
+                <div class="flex justify-between items-center mb-3">
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">လှုပ်ရှားမှု မျဉ်းကွေးပြဇယား</h4>
+                    <span class="text-[10px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md font-bold">Live Graph</span>
                 </div>
-                <p id="view-subtitle" class="text-xs text-slate-400 mt-0.5">လက်ရှိ ကြည့်ရှုနေသောဖိုင် - <span id="currentSessionTitle" class="text-emerald-400 font-bold">လတ်တလော စာရင်း</span></p>
+                <div class="h-64 relative">
+                    <canvas id="viewerLineChart"></canvas>
+                </div>
+            </div>
+            <div class="lg:col-span-1 statista-panel rounded-2xl p-5 shadow-2xl flex flex-col justify-between">
+                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">အချိုးအစား ကဏ္ဍခွဲခြမ်းစိတ်ဖြာမှု</h4>
+                <div class="h-56 relative flex items-center justify-center">
+                    <canvas id="viewerDoughnutChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modern Data Grid Aggregator Table -->
+        <div class="statista-panel rounded-2xl p-5 shadow-2xl overflow-hidden">
+            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">စာရင်းအချက်အလက် မှတ်တမ်းဇယား</h4>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs text-slate-300 border-collapse">
+                    <thead>
+                        <tr class="text-slate-400 uppercase border-b border-slate-800 bg-slate-900/40">
+                            <th class="py-3 px-4 font-bold">ရက်စွဲ</th>
+                            <th class="py-3 px-4 font-bold">အသုံးစရိတ်အမျိုးအစား / အကြောင်းအရာ</th>
+                            <th class="py-3 px-4 font-bold text-right">ကျသင့်ငွေပမာဏ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="viewerTableBody" class="divide-y divide-slate-800/40">
+                        <!-- Dynamic Input Rows loaded via JS Engine -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- ၂။ အက်ဒမင် စာမျက်နှာ (ADMIN WORKSPACE VIEW)   -->
+    <!-- ========================================== -->
+    <div id="admin-root-view" class="flex-1 w-full flex flex-col lg:flex-row hidden">
+        
+        <!-- Workspace Controller Sidebar Navigation Menu -->
+        <aside class="w-full lg:w-64 bg-slate-950/40 border-b lg:border-b-0 lg:border-r border-slate-800/60 p-5 flex flex-col gap-1">
+            <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest px-4 mb-2">Workspace Controls</p>
+            <button onclick="switchAdminTab('admin-dashboard')" id="tab-btn-admin-dashboard" class="active-nav flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold w-full text-left transition duration-150">
+                <span>📊</span> Dashboard Control
+            </button>
+            <button onclick="switchAdminTab('admin-data-entry')" id="tab-btn-admin-data-entry" class="text-slate-400 hover:text-white flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold w-full text-left transition duration-150">
+                <span>📝</span> Data Entry Form
+            </button>
+            <button onclick="switchAdminTab('admin-archive-manager')" id="tab-btn-admin-archive-manager" class="text-slate-400 hover:text-white flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold w-full text-left transition duration-150">
+                <span>🗃️</span> Archive Vault
+            </button>
+            
+            <div class="mt-auto pt-4 border-t border-slate-900/60 text-center">
+                <button onclick="processLogout()" class="w-full bg-rose-500/10 hover:bg-rose-600 text-rose-400 hover:text-white border border-rose-500/20 text-xs py-2 rounded-xl font-bold transition">
+                    Logout Control Room
+                </button>
+            </div>
+        </aside>
+
+        <!-- Admin Central Management Main Console Area -->
+        <main class="flex-1 p-6 space-y-6 overflow-y-auto max-h-[calc(100vh-70px)]">
+            
+            <!-- Contextual Operational Header Status -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-900 pb-4">
+                <div>
+                    <h2 class="text-lg font-black text-white" id="admin-panel-title">Dashboard Management View</h2>
+                    <p class="text-xs text-slate-400">လက်ရှိ စီမံခန့်ခွဲနေသောဖိုင်: <span id="adminSessionTitle" class="text-sky-400 font-bold">လတ်တလော စာရင်း</span></p>
+                </div>
+                <div class="flex gap-2">
+                    <button id="adminBackToActiveBtn" onclick="loadActiveSession()" class="hidden px-3.5 py-1.5 text-xs font-bold rounded-xl bg-slate-800 border border-slate-700 transition">🔄 လတ်တလော စာရင်းသို့ ပြန်မည်</button>
+                    <button id="sessionCloseActionBtn" onclick="toggleSessionCloseArchive()" class="px-3.5 py-1.5 text-xs font-black rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20 hover:bg-rose-500 hover:text-slate-950 transition">🗃️ လက်ရှိစာရင်း ပိတ်သိမ်းသိမ်းဆည်းမည်</button>
+                </div>
             </div>
 
-            <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
-                <button id="backToActiveBtn" onclick="loadActiveSession()" class="hidden px-3.5 py-2 text-xs font-semibold rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 transition flex items-center gap-1.5 shadow-md">
-                    🔄 <span>လတ်တလောစာရင်းသို့ ပြန်မည်</span>
-                </button>
-                <button id="sessionCtrlBtn" onclick="toggleSession()" class="hidden px-3.5 py-2 text-xs font-bold rounded-xl transition border border-rose-500/20 bg-rose-500/10 hover:bg-rose-500 hover:text-slate-950 text-rose-400 flex items-center gap-1.5 shadow-md shadow-rose-500/5">
-                    🗃️ <span>လက်ရှိစာရင်း ပိတ်သိမ်းမည်</span>
-                </button>
-                <!-- Mobile Only Access Lock -->
-                <button onclick="openAuthModal()" class="lg:hidden px-3 py-2 rounded-xl bg-slate-800 text-xs font-medium border border-slate-700 flex items-center gap-1">
-                    <span id="lockIconMob">🔒</span> <span id="adminBtnTextMob">Admin</span>
-                </button>
-            </div>
-        </header>
+            <!-- TAB AREA 1: MAIN REVENUE/DATA ANALYTICS VIEW -->
+            <div id="admin-dashboard" class="admin-tab-panel space-y-6">
+                <!-- Data Visual Metrics Cards Block -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <div class="statista-panel rounded-2xl p-5 shadow-xl">
+                        <p class="text-xs text-slate-400 font-semibold uppercase">စုစုပေါင်း ကုန်ကျငွေ</p>
+                        <h3 class="text-2xl font-black text-sky-400 mt-1" id="a-totalExpense">၀ ကျပ်</h3>
+                    </div>
+                    <div class="statista-panel rounded-2xl p-5 shadow-xl">
+                        <p class="text-xs text-slate-400 font-semibold uppercase">တစ်ဦးချင်း မျှဝေကျခံငွေ</p>
+                        <h3 class="text-2xl font-black text-slate-100 mt-1" id="a-perPersonExpense">၀ ကျပ်</h3>
+                    </div>
+                    <div class="statista-panel rounded-2xl p-5 shadow-xl">
+                        <p class="text-xs text-slate-400 font-semibold uppercase">မှတ်တမ်းအရေအတွက်</p>
+                        <h3 class="text-2xl font-black text-slate-100 mt-1" id="a-recordCount">0 ခု</h3>
+                    </div>
+                </div>
 
-        <!-- MAIN LAYOUT VIEWS CONTROLLER CONTAINER -->
-        <main class="p-6 max-w-6xl w-full mx-auto space-y-6 flex-1">
-
-            <!-- STATISTIC SUMMARY CARDS BLOCK (Always Visible on Top) -->
-            <section class="grid grid-cols-1 md:grid-cols-3 gap-5">
-                <div class="glass-panel rounded-2xl p-5 relative overflow-hidden group shadow-xl">
-                    <div class="absolute right-0 top-0 -mt-3 -mr-3 w-20 h-20 bg-emerald-500/5 rounded-full blur-xl group-hover:bg-emerald-500/10 transition-all duration-300"></div>
-                    <div class="flex items-center justify-between">
-                        <p class="text-xs text-slate-400 font-semibold tracking-wide">စုစုပေါင်း ကုန်ကျစရိတ်</p>
-                        <span class="text-lg">💰</span>
-                    </div>
-                    <h3 class="text-2xl font-black text-emerald-400 mt-2 tracking-tight" id="totalExpense">၀ ကျပ်</h3>
-                </div>
-                <div class="glass-panel rounded-2xl p-5 relative overflow-hidden group shadow-xl">
-                    <div class="absolute right-0 top-0 -mt-3 -mr-3 w-20 h-20 bg-blue-500/5 rounded-full blur-xl group-hover:bg-blue-500/10 transition-all duration-300"></div>
-                    <div class="flex items-center justify-between">
-                        <p class="text-xs text-slate-400 font-semibold tracking-wide">တစ်ယောက်ချင်းစီ ကျသင့်ငွေ</p>
-                        <span class="text-lg">👤</span>
-                    </div>
-                    <h3 class="text-2xl font-black text-slate-100 mt-2 tracking-tight" id="perPersonExpense">၀ ကျပ်</h3>
-                </div>
-                <div class="glass-panel rounded-2xl p-5 relative overflow-hidden group shadow-xl">
-                    <div class="absolute right-0 top-0 -mt-3 -mr-3 w-20 h-20 bg-purple-500/5 rounded-full blur-xl group-hover:bg-purple-500/10 transition-all duration-300"></div>
-                    <div class="flex items-center justify-between">
-                        <p class="text-xs text-slate-400 font-semibold tracking-wide">စုစုပေါင်း မှတ်တမ်းအရေအတွက်</p>
-                        <span class="text-lg">📝</span>
-                    </div>
-                    <h3 class="text-2xl font-black text-slate-100 mt-2 tracking-tight" id="recordCount">၀ ခု</h3>
-                </div>
-            </section>
-
-            <!-- VIEW 1: DASHBOARD VIEW (Default Grid Analytics) -->
-            <div id="dashboard-view" class="view-panel grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Visual Chart Dynamic Graphics -->
-                <div class="lg:col-span-3 glass-panel rounded-2xl p-5 shadow-2xl border border-slate-800/40">
-                    <div class="h-72 relative">
-                        <canvas id="expenseChart"></canvas>
-                    </div>
-                </div>
-                
-                <!-- Table Expense Lists Records Box -->
-                <div class="lg:col-span-3 glass-panel rounded-2xl p-6 shadow-2xl border border-slate-800/40 overflow-hidden">
+                <!-- Live Control Core Table View Grid -->
+                <div class="statista-panel rounded-2xl p-5 shadow-2xl overflow-hidden">
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">စီမံခန့်ခွဲမှု စာရင်းဇယား (အပြောင်းအလဲလုပ်ရန်)</h4>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-xs text-slate-300 border-collapse">
                             <thead>
-                                <tr class="text-slate-400 uppercase tracking-wider border-b border-slate-800/60 bg-slate-900/40 rounded-xl">
-                                    <th class="py-3.5 px-4 font-bold">ရက်စွဲ</th>
-                                    <th class="py-3.5 px-4 font-bold">အကြောင်းအရာ</th>
-                                    <th class="py-3.5 px-4 font-bold text-right">ကျသင့်ငွေ</th>
-                                    <th class="py-3.5 px-4 font-bold text-center admin-action hidden">လုပ်ဆောင်ချက်</th>
+                                <tr class="text-slate-400 uppercase border-b border-slate-800 bg-slate-900/40">
+                                    <th class="py-3 px-4 font-bold">ရက်စွဲ</th>
+                                    <th class="py-3 px-4 font-bold">အကြောင်းအရာ</th>
+                                    <th class="py-3 px-4 font-bold text-right">ကျသင့်ငွေ</th>
+                                    <th class="py-3 px-4 font-bold text-center">လုပ်ဆောင်ချက်</th>
                                 </tr>
                             </thead>
-                            <tbody id="expenseTableBody" class="divide-y divide-slate-800/30">
-                                <!-- Loaded dynamically via JS code -->
+                            <tbody id="adminTableBody" class="divide-y divide-slate-800/40">
+                                <!-- Loaded dynamically with destructible action parameters -->
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <!-- VIEW 2: FORM CONTROL INPUT VIEW -->
-            <div id="input-view" class="view-panel hidden max-w-xl mx-auto">
-                <div class="glass-panel rounded-2xl p-6 shadow-2xl border border-emerald-500/10 relative">
-                    <div class="visitor-lock-overlay absolute inset-0 bg-slate-950/80 backdrop-blur-md rounded-2xl flex flex-col items-center justify-center text-center p-6 z-20 transition-all duration-300">
-                        <span class="text-3xl mb-3">🔒</span>
-                        <h4 class="text-sm font-bold text-slate-200">Admin တိုက်ရိုက်ဝင်ရောက်ရန် လိုအပ်သည်</h4>
-                        <p class="text-xs text-slate-500 max-w-xs mt-1">စာရင်းအချက်အလက်အသစ်များ ထည့်သွင်းနိုင်ရန်အတွက် ဦးစွာ Admin Access လုပ်ပိုင်ခွင့်ကို ရယူပါ။</p>
-                        <button onclick="openAuthModal()" class="mt-4 px-4 py-2 text-xs font-bold rounded-xl bg-emerald-500 text-slate-950 hover:bg-emerald-600 transition shadow-lg shadow-emerald-500/10">Admin လုပ်ပိုင်ခွင့်တောင်းမည်</button>
+            <!-- TAB AREA 2: DATA ENTRY APPLICATION INTAKE FORM -->
+            <div id="admin-data-entry" class="admin-tab-panel hidden max-w-xl mx-auto">
+                <div class="statista-panel rounded-2xl p-6 shadow-2xl border border-sky-500/10">
+                    <div class="flex items-center gap-2 mb-4 border-b border-slate-800 pb-3">
+                        <span class="text-xl">📝</span>
+                        <h3 class="text-sm font-bold text-slate-200">အသုံးစရိတ် အချက်အလက်အသစ် ထည့်သွင်းခြင်း</h3>
                     </div>
-
                     <form id="expenseForm" onsubmit="saveExpense(event)" class="space-y-4">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-400 mb-1.5">ရက်စွဲ ရွေးချယ်ရန်</label>
-                            <input type="date" id="expDate" required class="w-full bg-slate-900/60 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500 transition">
+                            <label class="block text-xs font-bold text-slate-400 mb-1.5">ရက်စွဲ သတ်မှတ်ရန်</label>
+                            <input type="date" id="expDate" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-sky-500 transition">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-400 mb-1.5">အသုံးပြုသည့် အကြောင်းအရာကိစ္စ</label>
-                            <input type="text" id="expTitle" placeholder="ဥပမာ - ဆိုင်ကယ်ဆီဖိုး" required class="w-full bg-slate-900/60 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition">
+                            <label class="block text-xs font-bold text-slate-400 mb-1.5">အသုံးပြုသည့် အကြောင်းအရာကိစ္စ</label>
+                            <input type="text" id="expTitle" placeholder="ဥပမာ - ရုံးသုံးစက္ကူ ဝယ်ယူခြင်း" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-sky-500 transition">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-400 mb-1.5">ကျသင့်ငွေပမာဏ (ကျပ်)</label>
-                            <input type="number" id="expAmount" placeholder="ဥပမာ - ၅၀၀၀" required class="w-full bg-slate-900/60 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition">
+                            <label class="block text-xs font-bold text-slate-400 mb-1.5">ကျသင့်ငွေပမာဏ (ကျပ်)</label>
+                            <input type="number" id="expAmount" placeholder="ဥပမာ - ၂၅၀၀၀" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-sky-500 transition">
                         </div>
-                        <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 transition text-slate-950 font-bold text-xs py-3 rounded-xl shadow-xl shadow-emerald-500/10 active:scale-[0.98]">
-                            ဒေတာသိမ်းဆည်းသိမ်းဆည်းမည်
+                        <button type="submit" class="w-full bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold py-3 rounded-xl shadow-xl shadow-sky-500/10 transition active:scale-[0.99]">
+                            ဒေတာရင်းမြစ် သိမ်းဆည်းမည်
                         </button>
                     </form>
                 </div>
             </div>
 
-            <!-- VIEW 3: ARCHIVES FOLDERS VIEW SYSTEM -->
-            <div id="archive-view" class="view-panel hidden">
-                <div class="glass-panel rounded-2xl p-6 shadow-2xl border border-slate-800/40">
-                    <p class="text-xs text-slate-400 font-medium mb-4">သီးသန့်ပိတ်သိမ်း သိမ်းဆည်းခဲ့သော သမိုင်းဝင်စာရင်းတွဲများ -</p>
-                    <div id="archiveList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <!-- Loaded dynamically -->
+            <!-- TAB AREA 3: DATA VAULT / ARCHIVE FILE SYSTEM DIRECT DELETION -->
+            <div id="admin-archive-manager" class="admin-tab-panel hidden">
+                <div class="statista-panel rounded-2xl p-5 shadow-2xl">
+                    <p class="text-xs text-slate-400 font-medium mb-4">သိမ်းဆည်းထားသော စာရင်းဟောင်းဖိုင်များအားလုံးကို စီမံခန့်ခွဲရန် -</p>
+                    <div id="adminArchiveGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Loaded dynamically via Realtime Database Nodes -->
                     </div>
                 </div>
             </div>
@@ -227,29 +284,34 @@
         </main>
     </div>
 
-    <!-- CUSTOM AUTHENTICATION MODAL (REPLACES BROWSER PROMPT) -->
-    <div id="authModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md hidden transition-all duration-300 opacity-0">
-        <div class="glass-panel w-full max-w-sm rounded-2xl p-6 shadow-2xl border border-slate-800/60 transform scale-95 transition-all duration-300" id="authModalContainer">
-            <h3 id="modalAuthHeader" class="text-sm font-bold text-slate-200 flex items-center gap-2">🔒 Admin စစ်ဆေးခြင်း</h3>
-            <p id="modalAuthDesc" class="text-xs text-slate-400 mt-1">စနစ်အတွင်း ဒေတာအပြောင်းအလဲလုပ်ရန် လျှို့ဝှက်ကုဒ် လိုအပ်ပါသည်။</p>
-            
-            <div class="mt-4" id="passwordInputWrapper">
-                <input type="password" id="adminPassInput" placeholder="••••••" class="w-full tracking-widest text-center bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-emerald-500">
-            </div>
 
+    <!-- SECURITY AUTHORIZATION POPUP MODAL COMPONENT (Custom UI Overlay) -->
+    <div id="authModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md hidden opacity-0 transition-all duration-300">
+        <div class="statista-panel w-full max-w-sm rounded-2xl p-6 shadow-2xl border border-slate-800 transform scale-95 transition-all duration-300" id="authModalBox">
+            <div class="text-center space-y-2">
+                <span class="text-3xl inline-block p-2 rounded-2xl bg-sky-500/10 border border-sky-500/20 text-sky-400">🔑</span>
+                <h3 class="text-sm font-bold text-slate-100">အက်ဒမင် လုပ်ပိုင်ခွင့် စစ်ဆေးခြင်း</h3>
+                <p class="text-[11px] text-slate-500">စီမံခန့်ခွဲမှု Workspace သို့ ဝင်ရောက်ရန် လျှို့ဝှက်ကုဒ် လိုအပ်ပါသည်။</p>
+            </div>
+            <div class="mt-4">
+                <input type="password" id="adminPassInput" placeholder="••••••" class="w-full tracking-widest text-center bg-slate-900 border border-slate-700/60 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-sky-500 transition">
+            </div>
             <div class="flex items-center gap-2 mt-5">
-                <button onclick="closeAuthModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs py-2.5 rounded-xl border border-slate-700 transition">ပယ်ဖျက်မည်</button>
-                <button id="modalActionBtn" onclick="handleAuthSubmit()" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-slate-950 text-xs font-bold py-2.5 rounded-xl transition">ဝင်ရောက်မည်</button>
+                <button onclick="closeAuthModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs py-2.5 rounded-xl border border-slate-700 font-medium transition">ပယ်ဖျက်မည်</button>
+                <button onclick="handleAuthSubmit()" class="flex-1 bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold py-2.5 rounded-xl shadow-lg shadow-sky-500/10 transition">ဝင်ရောက်မည်</button>
             </div>
         </div>
     </div>
 
-    <!-- Firebase SDK Code Setup Layer -->
+
+    <!-- ========================================== -->
+    <!-- FIREBASE DATABASE SYSTEM SYNC JAVASCRIPT  -->
+    <!-- ========================================== -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
     <script>
-        // --- Firebase Config Data Block ---
+        // --- Firebase Operational Settings ---
         const firebaseConfig = {
             apiKey: "AIzaSyBiLX6RXHbI9bY-DA_ATyXoVgG_bedSu-4",
             authDomain: "my-group-project4.firebaseapp.com",
@@ -266,103 +328,105 @@
         let isAdmin = false;
         let activeExpenses = [];
         let displayedExpenses = [];
-        let expenseChartInstance = null;
         let isViewingArchive = false;
         let currentArchiveKey = null;
+        let globalSearchQuery = "";
+
+        // Chart instances pointers
+        let lineChartInstance = null;
+        let doughnutChartInstance = null;
         
         const ADMIN_PASSWORD = "205428"; 
         document.getElementById('expDate').valueAsDate = new Date();
 
-        // --- Core Multi-View Switcher Logic ---
-        function switchView(viewId) {
-            document.querySelectorAll('.view-panel').forEach(panel => panel.classList.add('hidden'));
-            document.getElementById(viewId).classList.remove('hidden');
+        // --- View Mode Transitions Setup ---
+        function switchViewMode(mode) {
+            const viewerRoot = document.getElementById('viewer-root-view');
+            const adminRoot = document.getElementById('admin-root-view');
+            const roleBadge = document.getElementById('roleBadge');
+            const authBtnText = document.getElementById('authBtnText');
+            const lockIcon = document.getElementById('lockIcon');
 
-            document.querySelectorAll('nav button').forEach(btn => {
-                btn.classList.remove('active-sidebar-item');
-                btn.classList.add('text-slate-400');
-            });
-            document.getElementById(`nav-${viewId}`).classList.add('active-sidebar-item');
-            document.getElementById(`nav-${viewId}`).classList.remove('text-slate-400');
-
-            // Dynamic header titles adjustments
-            const titles = {
-                'dashboard-view': 'ဒေတာ ခြုံငုံသုံးသပ်ချက်',
-                'input-view': 'အသုံးစရိတ်အသစ် ထည့်သွင်းခြင်း',
-                'archive-view': 'သိမ်းဆည်းထားသော ဖိုင်တွဲများ'
-            };
-            document.getElementById('view-title').innerText = titles[viewId];
+            if (mode === 'admin' && isAdmin) {
+                viewerRoot.classList.add('hidden');
+                adminRoot.classList.remove('hidden');
+                roleBadge.innerText = "Admin Workspace";
+                roleBadge.classList.replace('text-slate-400', 'text-sky-400');
+                authBtnText.innerText = "Viewer Window";
+                lockIcon.innerText = "🔓";
+                switchAdminTab('admin-dashboard');
+            } else {
+                adminRoot.classList.add('hidden');
+                viewerRoot.classList.remove('hidden');
+                roleBadge.innerText = "Viewer View";
+                roleBadge.classList.replace('text-sky-400', 'text-slate-400');
+                authBtnText.innerText = isAdmin ? "Admin Workspace" : "Admin Workspace";
+                lockIcon.innerText = isAdmin ? "🔓" : "🔒";
+            }
         }
 
-        // --- Custom Authentication Modal Framework ---
+        function switchAdminTab(tabId) {
+            document.querySelectorAll('.admin-tab-panel').forEach(panel => panel.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
+
+            document.querySelectorAll('aside button').forEach(btn => {
+                if(btn.id) {
+                    btn.classList.remove('active-nav');
+                    btn.classList.add('text-slate-400');
+                }
+            });
+            document.getElementById(`tab-btn-${tabId}`).classList.add('active-nav');
+            document.getElementById(`tab-btn-${tabId}`).classList.remove('text-slate-400');
+
+            const headers = {
+                'admin-dashboard': 'Dashboard Management View',
+                'admin-data-entry': 'Data Entry Intake System',
+                'admin-archive-manager': 'Storage Archive File Center'
+            };
+            document.getElementById('admin-panel-title').innerText = headers[tabId];
+        }
+
+        // --- Custom Authentication Engine Overlay ---
         function openAuthModal() {
-            const modal = document.getElementById('authModal');
-            const box = document.getElementById('authModalContainer');
-            
-            if(isAdmin) {
-                // Logout immediately if clicked while logged in
-                processLogout();
+            if (isAdmin) {
+                // If logged in, button switches views seamlessly instead of prompting
+                const viewerHidden = document.getElementById('viewer-root-view').classList.contains('hidden');
+                switchViewMode(viewerHidden ? 'viewer' : 'admin');
                 return;
             }
-
+            const modal = document.getElementById('authModal');
+            const box = document.getElementById('authModalBox');
             modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.classList.remove('opacity-0');
-                box.classList.remove('scale-95');
-            }, 50);
+            setTimeout(() => { modal.classList.remove('opacity-0'); box.classList.remove('scale-95'); }, 50);
             document.getElementById('adminPassInput').focus();
         }
 
         function closeAuthModal() {
             const modal = document.getElementById('authModal');
-            const box = document.getElementById('authModalContainer');
-            modal.classList.add('opacity-0');
-            box.classList.add('scale-95');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-                document.getElementById('adminPassInput').value = '';
-            }, 300);
+            const box = document.getElementById('authModalBox');
+            modal.classList.add('opacity-0'); box.classList.add('scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); document.getElementById('adminPassInput').value = ''; }, 200);
         }
 
         function handleAuthSubmit() {
-            const passInput = document.getElementById('adminPassInput').value.trim();
-            if (passInput === ADMIN_PASSWORD || Number(passInput) === 205428) {
-                processLoginSuccess();
+            const val = document.getElementById('adminPassInput').value.trim();
+            if (val === ADMIN_PASSWORD || Number(val) === 205428) {
+                isAdmin = true;
+                closeAuthModal();
+                switchViewMode('admin');
+                updateUI();
             } else {
                 alert("လျှို့ဝှက်နံပါတ် မှားယွင်းနေပါသည်။");
             }
         }
 
-        function processLoginSuccess() {
-            isAdmin = true;
-            closeAuthModal();
-            
-            // Adjust UI States
-            document.getElementById('lockIcon').innerText = "🔓";
-            document.getElementById('lockIconMob').innerText = "🔓";
-            document.getElementById('sidebarAdminStatus').innerText = "Admin Authorized";
-            document.getElementById('sidebarAdminStatus').classList.replace('text-slate-400', 'text-emerald-400');
-            
-            document.querySelectorAll('.visitor-lock-overlay').forEach(el => el.classList.add('hidden'));
-            document.getElementById('sessionCtrlBtn').classList.remove('hidden');
-            
-            updateUI();
-        }
-
         function processLogout() {
             isAdmin = false;
-            document.getElementById('lockIcon').innerText = "🔒";
-            document.getElementById('lockIconMob').innerText = "🔒";
-            document.getElementById('sidebarAdminStatus').innerText = "Visitor Mode";
-            document.getElementById('sidebarAdminStatus').classList.replace('text-emerald-400', 'text-slate-400');
-            
-            document.querySelectorAll('.visitor-lock-overlay').forEach(el => el.classList.remove('hidden'));
-            document.getElementById('sessionCtrlBtn').classList.add('hidden');
-            
+            switchViewMode('viewer');
             updateUI();
         }
 
-        // --- Myanmar Numbers Converter Utilities ---
+        // --- Number Conversion Systems ---
         function toMyanmarNumbers(num) {
             const mmNumbers = ['၀', '၁', '၂', '၃', '၄', '၅', '၆', '၇', '၈', '၉'];
             return num.toString().replace(/[0-9]/g, function (w) { return mmNumbers[+w]; });
@@ -372,7 +436,7 @@
             return toMyanmarNumbers(Number(amount).toLocaleString('en-US')) + " ကျပ်";
         }
 
-        // --- Real-time Firebase Listeners Sync Blocks ---
+        // --- Realtime Database Event Synchronization Loops ---
         db.ref('expenses').on('value', (snapshot) => {
             const data = snapshot.val();
             activeExpenses = [];
@@ -384,55 +448,29 @@
         });
 
         db.ref('archives').on('value', (snapshot) => {
-            renderArchivesGrid(snapshot.val());
+            const archives = snapshot.val();
+            renderArchiveDropdownSelectors(archives);
+            renderAdminArchivesGrid(archives);
+            
             if (isViewingArchive && currentArchiveKey) {
-                const archiveData = snapshot.val();
-                if (archiveData && archiveData[currentArchiveKey]) {
-                    loadArchivedSession(currentArchiveKey, archiveData[currentArchiveKey].name);
+                if (archives && archives[currentArchiveKey]) {
+                    loadArchivedSession(currentArchiveKey, archives[currentArchiveKey].name);
                 } else {
                     loadActiveSession();
                 }
             }
         });
 
-        // --- Render Archives Grid System ---
-        function renderArchivesGrid(archives) {
-            const container = document.getElementById('archiveList');
-            container.innerHTML = '';
-
-            if (!archives) {
-                container.innerHTML = `<div class="col-span-full text-center py-8 text-xs text-slate-500">သိမ်းဆည်းထားသော ဖိုင်တွဲဗဟိုချက် မရှိသေးပါ။</div>`;
-                return;
-            }
-
-            for (let archiveKey in archives) {
-                const archiveName = archives[archiveKey].name;
-                const card = document.createElement('div');
-                card.className = "bg-slate-900/60 border border-slate-800 p-4 rounded-xl flex flex-col justify-between gap-4 hover:border-emerald-500/30 transition duration-300 relative group";
-                
-                card.innerHTML = `
-                    <div class="cursor-pointer flex-1" onclick="loadArchivedSession('${archiveKey}', '${archiveName}')">
-                        <div class="text-xl">📁</div>
-                        <h4 class="text-xs font-bold text-slate-200 mt-2 truncate group-hover:text-emerald-400 transition">${archiveName}</h4>
-                        <p class="text-[10px] text-slate-500 mt-0.5">Click ဖတ်ရှုရန်</p>
-                    </div>
-                    <button onclick="deleteArchiveFolder('${archiveKey}', '${archiveName}')" class="archive-delete-btn absolute bottom-3 right-3 p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500 text-rose-400 hover:text-slate-950 text-xs transition border border-rose-500/10 ${isAdmin ? '' : 'hidden'}">
-                        🗑️
-                    </button>
-                `;
-                container.appendChild(card);
-            }
-        }
-
-        // --- Data Control Engine Blocks ---
+        // --- View & State Loader Handlers ---
         function loadActiveSession() {
             isViewingArchive = false;
             currentArchiveKey = null;
             displayedExpenses = [...activeExpenses];
             
             document.getElementById('currentSessionTitle').innerText = "လတ်တလော စာရင်း";
-            document.getElementById('archiveLabel').classList.add('hidden');
-            document.getElementById('backToActiveBtn').classList.add('hidden');
+            document.getElementById('adminSessionTitle').innerText = "လတ်တလော စာရင်း";
+            document.getElementById('viewerArchiveSelector').value = "active";
+            document.getElementById('adminBackToActiveBtn').classList.add('hidden');
             
             updateUI();
         }
@@ -441,7 +479,7 @@
             isViewingArchive = true;
             currentArchiveKey = archiveKey;
             
-            db.ref('archives/' + archiveKey + '/data').once('value', (snapshot) => {
+            db.ref(`archives/${archiveKey}/data`).once('value', (snapshot) => {
                 const data = snapshot.val();
                 displayedExpenses = [];
                 if (data) {
@@ -450,96 +488,192 @@
                 }
 
                 document.getElementById('currentSessionTitle').innerText = archiveName;
-                document.getElementById('archiveLabel').classList.remove('hidden');
-                document.getElementById('backToActiveBtn').classList.remove('hidden');
+                document.getElementById('adminSessionTitle').innerText = archiveName;
+                document.getElementById('viewerArchiveSelector').value = archiveKey;
+                document.getElementById('adminBackToActiveBtn').classList.remove('hidden');
                 
-                switchView('dashboard-view');
                 updateUI();
             });
         }
 
+        // --- Render Content Component Blocks ---
+        function renderArchiveDropdownSelectors(archives) {
+            const selector = document.getElementById('viewerArchiveSelector');
+            selector.innerHTML = '<option value="active">လတ်တလော စာရင်း</option>';
+            if (archives) {
+                for (let key in archives) {
+                    const opt = document.createElement('option');
+                    opt.value = key;
+                    opt.innerText = archives[key].name;
+                    selector.appendChild(opt);
+                }
+            }
+            if(isViewingArchive) selector.value = currentArchiveKey;
+        }
+
+        function renderAdminArchivesGrid(archives) {
+            const container = document.getElementById('adminArchiveGrid');
+            container.innerHTML = '';
+            if (!archives) {
+                container.innerHTML = `<div class="col-span-full text-center py-6 text-xs text-slate-500">သိမ်းဆည်းထားသော ဖိုင်ဗဟိုချက် မရှိသေးပါ။</div>`;
+                return;
+            }
+            for (let key in archives) {
+                const card = document.createElement('div');
+                card.className = "bg-slate-900/60 border border-slate-800 p-4 rounded-2xl flex items-center justify-between gap-3 hover:border-sky-500/20 transition group";
+                card.innerHTML = `
+                    <div class="cursor-pointer flex-1 truncate" onclick="loadArchivedSession('${key}', '${archives[key].name}')">
+                        <span class="text-xs font-bold text-slate-200 group-hover:text-sky-400 block truncate">📁 ${archives[key].name}</span>
+                        <span class="text-[10px] text-slate-500 block mt-0.5">စီမံခန့်ခွဲရန် နှိပ်ပါ</span>
+                    </div>
+                    <button onclick="deleteArchiveFolder('${key}', '${archives[key].name}')" class="p-2 text-xs rounded-xl bg-rose-500/10 hover:bg-rose-500 text-rose-400 hover:text-slate-950 transition">🗑️</button>
+                `;
+                container.appendChild(card);
+            }
+        }
+
+        function handleViewerFileChange(select) {
+            if (select.value === 'active') {
+                loadActiveSession();
+            } else {
+                const archiveName = select.options[select.selectedIndex].text;
+                loadArchivedSession(select.value, archiveName);
+            }
+        }
+
+        function handleGlobalSearch() {
+            globalSearchQuery = document.getElementById('globalSearch').value.toLowerCase().trim();
+            updateUI();
+        }
+
+        // --- Main System Dashboard Interface Renderer engine ---
         function updateUI() {
-            const tbody = document.getElementById('expenseTableBody');
-            tbody.innerHTML = '';
+            // Apply filtering logic based on stat search parameters
+            const filteredData = displayedExpenses.filter(item => {
+                if (!globalSearchQuery) return true;
+                return item.title.toLowerCase().includes(globalSearchQuery) || item.date.includes(globalSearchQuery);
+            });
+
+            // Calculate dynamic totals indices
             let total = 0;
             const chartData = {};
 
-            if (displayedExpenses.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="py-12 text-center text-slate-500 text-xs">ပြသစရာ ဒေတာ အချက်အလက် မရှိသေးပါ။</td></tr>`;
-            } else {
-                displayedExpenses.forEach(item => {
-                    total += Number(item.amount);
-                    chartData[item.date] = (chartData[item.date] || 0) + Number(item.amount);
+            filteredData.forEach(item => {
+                total += Number(item.amount);
+                chartData[item.date] = (chartData[item.date] || 0) + Number(item.amount);
+            });
 
-                    const tr = document.createElement('tr');
-                    tr.className = "hover:bg-slate-800/20 transition border-b border-slate-900";
-                    tr.innerHTML = `
-                        <td class="py-3.5 px-4 text-slate-400 font-medium">${toMyanmarNumbers(item.date)}</td>
-                        <td class="py-3.5 px-4 font-semibold text-slate-200">${item.title}</td>
-                        <td class="py-3.5 px-4 text-right font-bold text-emerald-400">${formatMyanmarCurrency(item.amount)}</td>
-                        <td class="py-3.5 px-4 text-center admin-action ${isAdmin ? '' : 'hidden'}">
-                            <button onclick="deleteExpense('${item.id}')" class="text-rose-400 hover:text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 px-2 py-1 rounded-md transition font-bold">
-                                ဖျက်မည်
-                            </button>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            }
+            const currencyFormatted = formatMyanmarCurrency(total);
+            const perPersonFormatted = formatMyanmarCurrency(Math.round(total / 10));
+            const recordsCountFormatted = toMyanmarNumbers(filteredData.length) + " ခု";
 
-            document.getElementById('totalExpense').innerText = formatMyanmarCurrency(total);
-            document.getElementById('perPersonExpense').innerText = formatMyanmarCurrency(Math.round(total / 10));
-            document.getElementById('recordCount').innerText = toMyanmarNumbers(displayedExpenses.length) + " ခု";
+            // Update Viewer UI Strings
+            document.getElementById('v-totalExpense').innerText = currencyFormatted;
+            document.getElementById('v-perPersonExpense').innerText = perPersonFormatted;
+            document.getElementById('v-recordCount').innerText = recordsCountFormatted;
 
-            document.querySelectorAll('.admin-action').forEach(el => { isAdmin ? el.classList.remove('hidden') : el.classList.add('hidden'); });
-            document.querySelectorAll('.archive-delete-btn').forEach(el => { isAdmin ? el.classList.remove('hidden') : el.classList.add('hidden'); });
+            // Update Admin UI Strings
+            document.getElementById('a-totalExpense').innerText = currencyFormatted;
+            document.getElementById('a-perPersonExpense').innerText = perPersonFormatted;
+            document.getElementById('a-recordCount').innerText = recordsCountFormatted;
 
-            renderChart(chartData);
+            // Build out the specific row layouts tables
+            renderTableGrid('viewerTableBody', filteredData, false);
+            renderTableGrid('adminTableBody', filteredData, true);
+
+            // Redraw operational canvas
+            renderAnalyticsCharts(chartData, filteredData);
         }
 
-        function renderChart(chartData) {
-            const sortedDates = Object.keys(chartData).sort((a, b) => new Date(a) - new Date(b));
-            const chartLabels = sortedDates.map(d => toMyanmarNumbers(d));
-            const chartValues = sortedDates.map(d => chartData[d]);
+        function renderTableGrid(tbodyId, data, isControlEnabled) {
+            const tbody = document.getElementById(tbodyId);
+            tbody.innerHTML = '';
+            if (data.length === 0) {
+                const colspan = isControlEnabled ? 4 : 3;
+                tbody.innerHTML = `<tr><td colspan="${colspan}" class="py-10 text-center text-slate-500 text-xs">ပြသစရာ ဒေတာ အချက်အလက် ရှာမတွေ့ပါ။</td></tr>`;
+                return;
+            }
+            data.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-800/20 transition border-b border-slate-900";
+                
+                let actionTd = '';
+                if(isControlEnabled) {
+                    actionTd = `<td class="py-3 px-4 text-center">
+                        <button onclick="deleteExpense('${item.id}')" class="text-rose-400 hover:text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 px-2.5 py-1 rounded-xl transition">ဖျက်ရန်</button>
+                    </td>`;
+                }
 
-            if (expenseChartInstance) { expenseChartInstance.destroy(); }
+                tr.innerHTML = `
+                    <td class="py-3 px-4 text-slate-400 font-medium">${toMyanmarNumbers(item.date)}</td>
+                    <td class="py-3 px-4 font-semibold text-slate-200">${item.title}</td>
+                    <td class="py-3 px-4 text-right font-bold text-sky-400">${formatMyanmarCurrency(item.amount)}</td>
+                    ${actionTd}
+                `;
+                tbody.appendChild(tr);
+            });
+        }
 
-            const ctx = document.getElementById('expenseChart').getContext('2d');
-            const gradient = ctx.createLinearGradient(0, 0, 0, 250);
-            gradient.addColorStop(0, 'rgba(16, 185, 129, 0.25)');
-            gradient.addColorStop(1, 'rgba(16, 185, 129, 0.00)');
+        // --- Visual Chart Analytics Integration Engine ---
+        function renderAnalyticsCharts(timeChartData, fullData) {
+            const sortedDates = Object.keys(timeChartData).sort((a, b) => new Date(a) - new Date(b));
+            const lineLabels = sortedDates.map(d => toMyanmarNumbers(d));
+            const lineValues = sortedDates.map(d => timeChartData[d]);
 
-            expenseChartInstance = new Chart(ctx, {
+            // Setup Line Chart Model
+            if (lineChartInstance) lineChartInstance.destroy();
+            const ctxLine = document.getElementById('viewerLineChart').getContext('2d');
+            const gradLine = ctxLine.createLinearGradient(0, 0, 0, 250);
+            gradLine.addColorStop(0, 'rgba(2, 132, 199, 0.25)');
+            gradLine.addColorStop(1, 'rgba(2, 132, 199, 0.00)');
+
+            lineChartInstance = new Chart(ctxLine, {
                 type: 'line',
                 data: {
-                    labels: chartLabels,
+                    labels: lineLabels,
+                    datasets: [{ data: lineValues, borderColor: '#0284c7', backgroundColor: gradLine, borderWidth: 2.5, fill: true, tension: 0.2, pointRadius: 3 }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { grid: { color: 'rgba(255,255,255,0.02)' }, ticks: { color: '#475569', font: { size: 10 } } },
+                        x: { grid: { display: false }, ticks: { color: '#475569', font: { size: 10 } } }
+                    }
+                }
+            });
+
+            // Setup Segmented Category Titles Doughnut Model (Statista Style Data Sorting)
+            const categories = {};
+            fullData.forEach(item => {
+                const key = item.title.substring(0, 8); // Cluster similar beginnings
+                categories[key] = (categories[key] || 0) + Number(item.amount);
+            });
+
+            if (doughnutChartInstance) doughnutChartInstance.destroy();
+            const ctxDoughnut = document.getElementById('viewerDoughnutChart').getContext('2d');
+            
+            doughnutChartInstance = new Chart(ctxDoughnut, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(categories),
                     datasets: [{
-                        data: chartValues,
-                        borderColor: '#10b981',
-                        backgroundColor: gradient,
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.3,
-                        pointRadius: 4,
-                        pointHoverRadius: 6,
-                        pointBackgroundColor: '#10b981'
+                        data: Object.values(categories),
+                        backgroundColor: ['#0284c7', '#0ea5e9', '#38bdf8', '#7dd3fc', '#bae6fd', '#334155'],
+                        borderWidth: 2,
+                        borderColor: '#0f172a'
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { 
-                        legend: { display: false },
-                        tooltip: { backgroundColor: '#0b0f19', borderColor: '#1f293d', borderWidth: 1, padding: 12 }
-                    },
-                    scales: {
-                        y: { grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: '#64748b' } },
-                        x: { grid: { display: false }, ticks: { color: '#64748b' } }
-                    }
+                    plugins: { legend: { display: true, position: 'bottom', labels: { color: '#94a3b8', font: { size: 9 }, boxWidth: 10 } } }
                 }
             });
         }
 
+        // --- Data Interaction & Intake Injections ---
         function saveExpense(e) {
             e.preventDefault();
             if (!isAdmin) return;
@@ -551,33 +685,33 @@
             db.ref('expenses').push({ date: date, title: title, amount: Number(amount) }).then(() => {
                 document.getElementById('expTitle').value = '';
                 document.getElementById('expAmount').value = '';
-                switchView('dashboard-view');
+                switchAdminTab('admin-dashboard');
             });
         }
 
         function deleteExpense(id) {
             if (!isAdmin) return;
-            if (confirm("ဤမှတ်တမ်းကို ဇယားထဲမှ လုံးဝဖျက်ပစ်ရန် သေချာပါသလား?")) {
+            if (confirm("ဤမှတ်တမ်းအချက်အလက်ကို အပြီးတိုင် ဖျက်ဆီးပစ်ရန် သေချာပါသလား?")) {
                 if (isViewingArchive && currentArchiveKey) {
                     db.ref(`archives/${currentArchiveKey}/data/${id}`).remove();
                 } else {
-                    db.ref('expenses/' + id).remove();
+                    db.ref(`expenses/${id}`).remove();
                 }
             }
         }
 
         function deleteArchiveFolder(key, name) {
             if (!isAdmin) return;
-            if (confirm(`"${name}" ဖိုင်တွဲတစ်ခုလုံးကို အပြီးတိုင်ဖျက်ဆီးပစ်ရန် သေချာပါသလား?`)) {
+            if (confirm(`"${name}" စာရင်းတွဲဖိုင်တစ်ခုလုံးကို အပြီးတိုင် ရှင်းလင်းဖျက်ဆီးပစ်ရန် သေချာပါသလား?\n(မှတ်ချက် - ပြန်လည်ရယူ၍မရနိုင်ပါ)`)) {
                 db.ref(`archives/${key}`).remove().then(() => {
-                    if(currentArchiveKey === key) loadActiveSession();
+                    if (currentArchiveKey === key) loadActiveSession();
                 });
             }
         }
 
-        function toggleSession() {
+        function toggleSessionCloseArchive() {
             if (!isAdmin || activeExpenses.length === 0) return;
-            const archiveName = prompt("ဤစာရင်းပိတ်သိမ်းမှုကို မှတ်သားရန် ဖိုင်ခေါင်းစဉ် ပေးပါ -");
+            const archiveName = prompt("ဤစာရင်းပိတ်သိမ်းမှုကို ဖတ်ရှုရလွယ်ကူစေမည့် စာရင်းအမည် ခေါင်းစဉ်တစ်ခု ပေးပါ -");
             if (!archiveName || archiveName.trim() === "") return;
 
             const archiveRef = db.ref('archives').push();
@@ -593,7 +727,7 @@
             }).then(() => {
                 db.ref('expenses').remove().then(() => {
                     loadActiveSession();
-                    switchView('archive-view');
+                    switchAdminTab('admin-archive-manager');
                 });
             });
         }
