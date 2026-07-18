@@ -48,7 +48,6 @@
             color: #ffffff;
             box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
         }
-        /* Custom Scrollbar styled for analytics */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #060b13; }
         ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 99px; }
@@ -57,7 +56,7 @@
 </head>
 <body class="text-slate-100 min-h-screen antialiased flex flex-col">
 
-    <!-- TOP GLOBAL NAVIGATION BAR (Statista Premium Design) -->
+    <!-- TOP GLOBAL NAVIGATION BAR -->
     <nav class="border-b border-slate-800/80 bg-slate-950/90 backdrop-blur-md sticky top-0 z-50 px-6 py-3.5 flex justify-between items-center">
         <div class="flex items-center gap-3">
             <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-500 to-blue-600 flex items-center justify-center shadow-lg shadow-sky-500/20">
@@ -69,7 +68,7 @@
             </div>
         </div>
 
-        <!-- Global Search Bar (Statista Style Integration) -->
+        <!-- Global Search Bar -->
         <div class="hidden md:flex items-center bg-slate-900 border border-slate-700/60 rounded-xl px-3 py-1.5 w-96 gap-2 focus-within:border-sky-500 transition-all duration-150">
             <span class="text-slate-500 text-xs">🔍</span>
             <input type="text" id="globalSearch" oninput="handleGlobalSearch()" placeholder="အကြောင်းအရာ သို့မဟုတ် ရက်စွဲဖြင့် စစ်ထုတ်ရှာဖွေပါ..." class="bg-transparent text-xs text-slate-200 outline-none w-full placeholder-slate-600">
@@ -86,46 +85,43 @@
 
 
     <!-- ========================================== -->
-    <!-- ၁။ ကြည့်ရှုသူ စာမျက်နှာ (VIEWER VIEW CONTAINER) -->
+    <!-- ၁။ ကြည့်ရှုသူ စာမျက်နှာ (VIEWER VIEW)        -->
     <!-- ========================================== -->
     <div id="viewer-root-view" class="flex-1 w-full max-w-7xl mx-auto p-4 md:p-6 space-y-6">
         
-        <!-- Header Controls (Google Analytics Style Filtering) -->
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-900 pb-4">
             <div>
                 <h2 class="text-lg font-extrabold text-white">အသုံးစရိတ် ကိန်းဂဏန်း ခွဲခြမ်းစိတ်ဖြာမှု ပြဇယား</h2>
                 <p class="text-xs text-slate-400">Real-time Public Data Feeds</p>
             </div>
-            <!-- Archive File Dynamic Dropdown Selector -->
             <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
                 <span class="text-xs text-slate-500 font-medium">စာရင်းဖိုင် ရွေးချယ်ရန်:</span>
                 <select id="viewerArchiveSelector" onchange="handleViewerFileChange(this)" class="bg-slate-900 border border-slate-800 text-xs text-slate-300 rounded-xl px-3 py-2 outline-none focus:border-sky-500 transition">
                     <option value="active">လတ်တလော စာရင်း</option>
-                    <!-- Dynamically injected from Database -->
                 </select>
             </div>
         </div>
 
-        <!-- Metric Analytics Cards Section -->
+        <!-- Metric Analytics Cards -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-            <div class="statista-panel rounded-2xl p-5 shadow-xl relative overflow-hidden group">
+            <div class="statista-panel rounded-2xl p-5 shadow-xl">
                 <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">စုစုပေါင်း သုံးစွဲမှုပမာဏ</p>
                 <h3 class="text-3xl font-black text-sky-400 mt-2 tracking-tight" id="v-totalExpense">၀ ကျပ်</h3>
                 <span class="text-[10px] text-slate-500 mt-1 block">အခြေခံ တွက်ချက်ထားသော စုစုပေါင်းမှတ်တမ်း</span>
             </div>
-            <div class="statista-panel rounded-2xl p-5 shadow-xl relative overflow-hidden group">
+            <div class="statista-panel rounded-2xl p-5 shadow-xl">
                 <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">တစ်ဦးလျှင် ကျသင့်ငွေ (၁၀ ဦးနှုန်း)</p>
                 <h3 class="text-3xl font-black text-slate-100 mt-2 tracking-tight" id="v-perPersonExpense">၀ ကျပ်</h3>
                 <span class="text-[10px] text-slate-500 mt-1 block">စုစုပေါင်းမှ တစ်ဦးချင်း မျှဝေကျသင့်ငွေ</span>
             </div>
-            <div class="statista-panel rounded-2xl p-5 shadow-xl relative overflow-hidden group">
+            <div class="statista-panel rounded-2xl p-5 shadow-xl">
                 <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">စုစုပေါင်း အချက်အလက် (Data Rows)</p>
                 <h3 class="text-3xl font-black text-slate-100 mt-2 tracking-tight" id="v-recordCount">၀ ခု</h3>
                 <span class="text-[10px] text-slate-500 mt-1 block">စနစ်တွင်းရှိ အသုံးစရိတ် ကဏ္ဍစုစုပေါင်း</span>
             </div>
         </div>
 
-        <!-- Graphic Analytics Core Charts (TradingView/GA4 Visual Integration) -->
+        <!-- Core Charts -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div class="lg:col-span-2 statista-panel rounded-2xl p-5 shadow-2xl">
                 <div class="flex justify-between items-center mb-3">
@@ -144,7 +140,7 @@
             </div>
         </div>
 
-        <!-- Modern Data Grid Aggregator Table -->
+        <!-- Data Grid Aggregator Table -->
         <div class="statista-panel rounded-2xl p-5 shadow-2xl overflow-hidden">
             <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">စာရင်းအချက်အလက် မှတ်တမ်းဇယား</h4>
             <div class="overflow-x-auto">
@@ -157,7 +153,7 @@
                         </tr>
                     </thead>
                     <tbody id="viewerTableBody" class="divide-y divide-slate-800/40">
-                        <!-- Dynamic Input Rows loaded via JS Engine -->
+                        <!-- Dynamic Rows Loop -->
                     </tbody>
                 </table>
             </div>
@@ -166,11 +162,11 @@
 
 
     <!-- ========================================== -->
-    <!-- ၂။ အက်ဒမင် စာမျက်နှာ (ADMIN WORKSPACE VIEW)   -->
+    <!-- ၂။ အက်ဒမင် စာမျက်နှာ (ADMIN WORKSPACE)       -->
     <!-- ========================================== -->
     <div id="admin-root-view" class="flex-1 w-full flex flex-col lg:flex-row hidden">
         
-        <!-- Workspace Controller Sidebar Navigation Menu -->
+        <!-- Sidebar Menu Controls -->
         <aside class="w-full lg:w-64 bg-slate-950/40 border-b lg:border-b-0 lg:border-r border-slate-800/60 p-5 flex flex-col gap-1">
             <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest px-4 mb-2">Workspace Controls</p>
             <button onclick="switchAdminTab('admin-dashboard')" id="tab-btn-admin-dashboard" class="active-nav flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold w-full text-left transition duration-150">
@@ -190,10 +186,9 @@
             </div>
         </aside>
 
-        <!-- Admin Central Management Main Console Area -->
+        <!-- Main Workspace Console -->
         <main class="flex-1 p-6 space-y-6 overflow-y-auto max-h-[calc(100vh-70px)]">
             
-            <!-- Contextual Operational Header Status -->
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-900 pb-4">
                 <div>
                     <h2 class="text-lg font-black text-white" id="admin-panel-title">Dashboard Management View</h2>
@@ -205,9 +200,8 @@
                 </div>
             </div>
 
-            <!-- TAB AREA 1: MAIN REVENUE/DATA ANALYTICS VIEW -->
+            <!-- TAB 1: MAIN MANAGEMENT CONTROL -->
             <div id="admin-dashboard" class="admin-tab-panel space-y-6">
-                <!-- Data Visual Metrics Cards Block -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                     <div class="statista-panel rounded-2xl p-5 shadow-xl">
                         <p class="text-xs text-slate-400 font-semibold uppercase">စုစုပေါင်း ကုန်ကျငွေ</p>
@@ -223,7 +217,6 @@
                     </div>
                 </div>
 
-                <!-- Live Control Core Table View Grid -->
                 <div class="statista-panel rounded-2xl p-5 shadow-2xl overflow-hidden">
                     <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">စီမံခန့်ခွဲမှု စာရင်းဇယား (အပြောင်းအလဲလုပ်ရန်)</h4>
                     <div class="overflow-x-auto">
@@ -237,14 +230,14 @@
                                 </tr>
                             </thead>
                             <tbody id="adminTableBody" class="divide-y divide-slate-800/40">
-                                <!-- Loaded dynamically with destructible action parameters -->
+                                <!-- Admin Rows Loop -->
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <!-- TAB AREA 2: DATA ENTRY APPLICATION INTAKE FORM -->
+            <!-- TAB 2: DATA ENTRY INTAKE FORM -->
             <div id="admin-data-entry" class="admin-tab-panel hidden max-w-xl mx-auto">
                 <div class="statista-panel rounded-2xl p-6 shadow-2xl border border-sky-500/10">
                     <div class="flex items-center gap-2 mb-4 border-b border-slate-800 pb-3">
@@ -271,12 +264,12 @@
                 </div>
             </div>
 
-            <!-- TAB AREA 3: DATA VAULT / ARCHIVE FILE SYSTEM DIRECT DELETION -->
+            <!-- TAB 3: ARCHIVE FILE VAULT -->
             <div id="admin-archive-manager" class="admin-tab-panel hidden">
                 <div class="statista-panel rounded-2xl p-5 shadow-2xl">
                     <p class="text-xs text-slate-400 font-medium mb-4">သိမ်းဆည်းထားသော စာရင်းဟောင်းဖိုင်များအားလုံးကို စီမံခန့်ခွဲရန် -</p>
                     <div id="adminArchiveGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <!-- Loaded dynamically via Realtime Database Nodes -->
+                        <!-- Loaded via Firebase -->
                     </div>
                 </div>
             </div>
@@ -285,7 +278,7 @@
     </div>
 
 
-    <!-- SECURITY AUTHORIZATION POPUP MODAL COMPONENT (Custom UI Overlay) -->
+    <!-- SECURITY AUTHORIZATION POPUP MODAL -->
     <div id="authModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md hidden opacity-0 transition-all duration-300">
         <div class="statista-panel w-full max-w-sm rounded-2xl p-6 shadow-2xl border border-slate-800 transform scale-95 transition-all duration-300" id="authModalBox">
             <div class="text-center space-y-2">
@@ -305,13 +298,13 @@
 
 
     <!-- ========================================== -->
-    <!-- FIREBASE DATABASE SYSTEM SYNC JAVASCRIPT  -->
+    <!-- FIREBASE PLATFORM MODULE INJECTIONS       -->
     <!-- ========================================== -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
     <script>
-        // --- Firebase Operational Settings ---
+        // --- Firebase Configuration ---
         const firebaseConfig = {
             apiKey: "AIzaSyBiLX6RXHbI9bY-DA_ATyXoVgG_bedSu-4",
             authDomain: "my-group-project4.firebaseapp.com",
@@ -332,14 +325,13 @@
         let currentArchiveKey = null;
         let globalSearchQuery = "";
 
-        // Chart instances pointers
         let lineChartInstance = null;
         let doughnutChartInstance = null;
         
         const ADMIN_PASSWORD = "205428"; 
         document.getElementById('expDate').valueAsDate = new Date();
 
-        // --- View Mode Transitions Setup ---
+        // --- System View Transitions ---
         function switchViewMode(mode) {
             const viewerRoot = document.getElementById('viewer-root-view');
             const adminRoot = document.getElementById('admin-root-view');
@@ -360,7 +352,7 @@
                 viewerRoot.classList.remove('hidden');
                 roleBadge.innerText = "Viewer View";
                 roleBadge.classList.replace('text-sky-400', 'text-slate-400');
-                authBtnText.innerText = isAdmin ? "Admin Workspace" : "Admin Workspace";
+                authBtnText.innerText = "Admin Workspace";
                 lockIcon.innerText = isAdmin ? "🔓" : "🔒";
             }
         }
@@ -386,10 +378,9 @@
             document.getElementById('admin-panel-title').innerText = headers[tabId];
         }
 
-        // --- Custom Authentication Engine Overlay ---
+        // --- Security Modal Handlers ---
         function openAuthModal() {
             if (isAdmin) {
-                // If logged in, button switches views seamlessly instead of prompting
                 const viewerHidden = document.getElementById('viewer-root-view').classList.contains('hidden');
                 switchViewMode(viewerHidden ? 'viewer' : 'admin');
                 return;
@@ -426,7 +417,7 @@
             updateUI();
         }
 
-        // --- Number Conversion Systems ---
+        // --- Core Value Converters ---
         function toMyanmarNumbers(num) {
             const mmNumbers = ['၀', '၁', '၂', '၃', '၄', '၅', '၆', '၇', '၈', '၉'];
             return num.toString().replace(/[0-9]/g, function (w) { return mmNumbers[+w]; });
@@ -436,7 +427,7 @@
             return toMyanmarNumbers(Number(amount).toLocaleString('en-US')) + " ကျပ်";
         }
 
-        // --- Realtime Database Event Synchronization Loops ---
+        // --- Realtime DB Dynamic Pipeline Sync ---
         db.ref('expenses').on('value', (snapshot) => {
             const data = snapshot.val();
             activeExpenses = [];
@@ -444,7 +435,11 @@
                 for (let key in data) { activeExpenses.push({ id: key, ...data[key] }); }
                 activeExpenses.sort((a, b) => new Date(b.date) - new Date(a.date));
             }
-            if (!isViewingArchive) { loadActiveSession(); }
+            // အက်ဒမင်က ဒေတာအသစ်သွင်းလိုက်တာနဲ့ active ဖြစ်နေတဲ့ မျက်နှာပြင်နှစ်ခုလုံးကို ချက်ချင်း refresh လုပ်ပေးပါတယ်
+            if (!isViewingArchive) {
+                displayedExpenses = [...activeExpenses];
+                updateUI();
+            }
         });
 
         db.ref('archives').on('value', (snapshot) => {
@@ -461,13 +456,12 @@
             }
         });
 
-        // --- View & State Loader Handlers ---
+        // --- Session Handlers ---
         function loadActiveSession() {
             isViewingArchive = false;
             currentArchiveKey = null;
             displayedExpenses = [...activeExpenses];
             
-            document.getElementById('currentSessionTitle').innerText = "လတ်တလော စာရင်း";
             document.getElementById('adminSessionTitle').innerText = "လတ်တလော စာရင်း";
             document.getElementById('viewerArchiveSelector').value = "active";
             document.getElementById('adminBackToActiveBtn').classList.add('hidden');
@@ -487,7 +481,6 @@
                     displayedExpenses.sort((a, b) => new Date(b.date) - new Date(a.date));
                 }
 
-                document.getElementById('currentSessionTitle').innerText = archiveName;
                 document.getElementById('adminSessionTitle').innerText = archiveName;
                 document.getElementById('viewerArchiveSelector').value = archiveKey;
                 document.getElementById('adminBackToActiveBtn').classList.remove('hidden');
@@ -496,7 +489,7 @@
             });
         }
 
-        // --- Render Content Component Blocks ---
+        // --- DOM Component Renderers ---
         function renderArchiveDropdownSelectors(archives) {
             const selector = document.getElementById('viewerArchiveSelector');
             selector.innerHTML = '<option value="active">လတ်တလော စာရင်း</option>';
@@ -546,15 +539,13 @@
             updateUI();
         }
 
-        // --- Main System Dashboard Interface Renderer engine ---
+        // --- Core Application Orchestration (Update Dashboard Data & Charts) ---
         function updateUI() {
-            // Apply filtering logic based on stat search parameters
             const filteredData = displayedExpenses.filter(item => {
                 if (!globalSearchQuery) return true;
                 return item.title.toLowerCase().includes(globalSearchQuery) || item.date.includes(globalSearchQuery);
             });
 
-            // Calculate dynamic totals indices
             let total = 0;
             const chartData = {};
 
@@ -567,21 +558,21 @@
             const perPersonFormatted = formatMyanmarCurrency(Math.round(total / 10));
             const recordsCountFormatted = toMyanmarNumbers(filteredData.length) + " ခု";
 
-            // Update Viewer UI Strings
+            // Update Viewer Text Nodes
             document.getElementById('v-totalExpense').innerText = currencyFormatted;
             document.getElementById('v-perPersonExpense').innerText = perPersonFormatted;
             document.getElementById('v-recordCount').innerText = recordsCountFormatted;
 
-            // Update Admin UI Strings
+            // Update Admin Text Nodes
             document.getElementById('a-totalExpense').innerText = currencyFormatted;
             document.getElementById('a-perPersonExpense').innerText = perPersonFormatted;
             document.getElementById('a-recordCount').innerText = recordsCountFormatted;
 
-            // Build out the specific row layouts tables
+            // Render Both Grid Tables synchronously
             renderTableGrid('viewerTableBody', filteredData, false);
             renderTableGrid('adminTableBody', filteredData, true);
 
-            // Redraw operational canvas
+            // Re-render Graph Plots
             renderAnalyticsCharts(chartData, filteredData);
         }
 
@@ -614,13 +605,12 @@
             });
         }
 
-        // --- Visual Chart Analytics Integration Engine ---
+        // --- ChartJS Matrix Controllers ---
         function renderAnalyticsCharts(timeChartData, fullData) {
             const sortedDates = Object.keys(timeChartData).sort((a, b) => new Date(a) - new Date(b));
             const lineLabels = sortedDates.map(d => toMyanmarNumbers(d));
             const lineValues = sortedDates.map(d => timeChartData[d]);
 
-            // Setup Line Chart Model
             if (lineChartInstance) lineChartInstance.destroy();
             const ctxLine = document.getElementById('viewerLineChart').getContext('2d');
             const gradLine = ctxLine.createLinearGradient(0, 0, 0, 250);
@@ -644,10 +634,9 @@
                 }
             });
 
-            // Setup Segmented Category Titles Doughnut Model (Statista Style Data Sorting)
             const categories = {};
             fullData.forEach(item => {
-                const key = item.title.substring(0, 8); // Cluster similar beginnings
+                const key = item.title.substring(0, 8);
                 categories[key] = (categories[key] || 0) + Number(item.amount);
             });
 
@@ -673,7 +662,7 @@
             });
         }
 
-        // --- Data Interaction & Intake Injections ---
+        // --- Data Mutations & Writing Functions ---
         function saveExpense(e) {
             e.preventDefault();
             if (!isAdmin) return;
