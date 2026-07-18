@@ -33,6 +33,20 @@
             font-family: 'Padauk', 'Kohit', sans-serif;
             background: radial-gradient(circle at top, #1e293b, #0f172a);
         }
+        /* Custom Scrollbar for better look */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
     </style>
 </head>
 <body class="text-slate-100 min-h-screen pb-12 antialiased">
@@ -51,13 +65,13 @@
             </div>
             
             <div class="flex items-center gap-2">
-                <!-- Admin Close/Open Session Button (Hidden by default) -->
+                <!-- Admin Close/Open Session Button -->
                 <button id="sessionCtrlBtn" onclick="toggleSession()" class="hidden px-3.5 py-2 text-xs font-bold rounded-xl transition-all duration-200 border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500 hover:text-slate-950 text-rose-400 flex items-center gap-1.5">
                     🗃️ <span>လက်ရှိစာရင်း ပိတ်သိမ်းမည်</span>
                 </button>
                 <!-- Admin Authorization Button -->
                 <button id="adminBtn" onclick="toggleAdminMode()" class="px-4 py-2 text-xs font-semibold rounded-xl transition-all duration-200 border border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center gap-2">
-                    <span id="lockIcon">🔒</span> <span id="adminBtnText">X</span>
+                    <span id="lockIcon">🔒</span> <span id="adminBtnText">Admin ဝင်မည်</span>
                 </button>
             </div>
         </div>
@@ -66,17 +80,17 @@
     <!-- Main Content Area -->
     <main class="max-w-6xl mx-auto px-4 mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        <!-- Left Column: Summary Cards, Session Name & Inputs -->
+        <!-- Left Column: Context Badges, Summaries, Folders & Form -->
         <div class="lg:col-span-1 flex flex-col gap-6">
             
             <!-- Active Session/Selected File Badge -->
-            <div class="rounded-2xl bg-slate-900/80 border border-slate-800 p-4">
+            <div class="rounded-2xl bg-slate-900/80 border border-slate-800 p-4 shadow-xl">
                 <p class="text-xs text-slate-500">လက်ရှိ ကြည့်ရှုနေသော စာရင်းဖိုင်</p>
                 <div class="flex items-center justify-between mt-1">
                     <span id="currentSessionTitle" class="text-sm font-extrabold text-emerald-400">လတ်တလော စာရင်း</span>
                     <span id="archiveLabel" class="hidden text-[10px] uppercase font-bold px-2 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/30 text-amber-400">စာရင်းဟောင်း</span>
                 </div>
-                <button id="backToActiveBtn" onclick="loadActiveSession()" class="hidden w-full mt-3 text-center text-xs text-slate-300 bg-slate-800 hover:bg-slate-700 py-1.5 rounded-lg border border-slate-700 transition">
+                <button id="backToActiveBtn" onclick="loadActiveSession()" class="hidden w-full mt-3 text-center text-xs text-slate-300 bg-slate-800 hover:bg-slate-700 py-2 rounded-lg border border-slate-700 transition font-medium">
                     🔄 လတ်တလော စာရင်းသို့ ပြန်သွားမည်
                 </button>
             </div>
@@ -87,7 +101,7 @@
                 <p class="text-sm text-slate-400">စုစုပေါင်း ကုန်ကျစရိတ်</p>
                 <h3 class="text-3xl font-extrabold text-emerald-400 mt-2" id="totalExpense">၀ ကျပ်</h3>
                 <div class="mt-4 pt-4 border-t border-slate-800/80 flex justify-between text-xs text-slate-400">
-                    <span>တစ်ယောက်ချင်းစီ ကျသင့်ငွေ:</span>
+                    <span>တစ်ယောက်ချင်းစီ ကျသင့်ငွေ (၁၀ ဦးစာ):</span>
                     <span class="font-semibold text-slate-200" id="perPersonExpense">၀ ကျပ်</span>
                 </div>
             </div>
@@ -97,8 +111,7 @@
                 <h3 class="text-xs font-bold text-slate-400 mb-3 flex items-center gap-1.5">
                     📁 <span>သိမ်းဆည်းထားသော စာရင်းဖိုင်များ</span>
                 </h3>
-                <div id="archiveList" class="space-y-2 max-h-40 overflow-y-auto pr-1">
-                    <!-- Archived files list dynamically -->
+                <div id="archiveList" class="space-y-2 max-h-48 overflow-y-auto pr-1">
                     <p class="text-[11px] text-slate-600 text-center py-2">သိမ်းဆည်းထားသော ဖိုင်မရှိသေးပါ။</p>
                 </div>
             </div>
@@ -135,7 +148,7 @@
 
         </div>
 
-        <!-- Right Column: Visual Analytics & Historical List -->
+        <!-- Right Column: Graphs & Detailed Lists -->
         <div class="lg:col-span-2 flex flex-col gap-6">
             
             <!-- Visual Chart Card -->
@@ -143,7 +156,7 @@
                 <h3 class="text-sm font-bold text-slate-300 mb-4 flex items-center gap-2">
                     📊 <span id="chartContextTitle">နေ့စဉ် အသုံးစရိတ် လှုပ်ရှားမှုပြဇယား</span>
                 </h3>
-                <div class="h-64">
+                <div class="h-64 relative">
                     <canvas id="expenseChart"></canvas>
                 </div>
             </div>
@@ -155,7 +168,7 @@
                         📜 <span id="tableContextTitle">အသုံးစရိတ်မှတ်တမ်းများ</span>
                     </h3>
                     <div>
-                        <span class="text-xs bg-slate-800 text-slate-400 px-2.5 py-1 rounded-full border border-slate-700" id="recordCount">0 ခု</span>
+                        <span class="text-xs bg-slate-800 text-slate-400 px-2.5 py-1 rounded-full border border-slate-700" id="recordCount">၀ ခု</span>
                     </div>
                 </div>
 
@@ -170,7 +183,7 @@
                             </tr>
                         </thead>
                         <tbody id="expenseTableBody" class="divide-y divide-slate-800/50">
-                            <!-- Dynamically loaded -->
+                            <!-- Loaded Dynamically -->
                         </tbody>
                     </table>
                 </div>
@@ -203,6 +216,7 @@
         let displayedExpenses = [];
         let expenseChartInstance = null;
         let isViewingArchive = false;
+        let currentArchiveKey = null; // Track current viewing archive folder
         
         const ADMIN_PASSWORD = "205428"; 
 
@@ -220,7 +234,7 @@
             return toMyanmarNumbers(Number(amount).toLocaleString('en-US')) + " ကျပ်";
         }
 
-        // --- Real-time Listeners ---
+        // --- Real-time Data Synchronization ---
         // 1. Listen to Current Active Expenses
         db.ref('expenses').on('value', (snapshot) => {
             const data = snapshot.val();
@@ -236,9 +250,22 @@
             }
         });
 
-        // 2. Listen to Archives (Saved Folders)
+        // 2. Listen to Archives (Saved Folders List)
         db.ref('archives').on('value', (snapshot) => {
-            const archives = snapshot.val();
+            renderArchiveList(snapshot.val());
+            // If viewing archive, update UI data dynamically on deletion/modifications
+            if (isViewingArchive && currentArchiveKey) {
+                const archiveData = snapshot.val();
+                if (archiveData && archiveData[currentArchiveKey]) {
+                    loadArchivedSession(currentArchiveKey, archiveData[currentArchiveKey].name);
+                } else {
+                    loadActiveSession(); // Go back to active if archive deleted
+                }
+            }
+        });
+
+        // --- Render Archive Navigation Side-Panel ---
+        function renderArchiveList(archives) {
             const archiveContainer = document.getElementById('archiveList');
             archiveContainer.innerHTML = '';
 
@@ -249,20 +276,36 @@
 
             for (let archiveKey in archives) {
                 const archiveName = archives[archiveKey].name;
-                const btn = document.createElement('button');
-                btn.className = "w-full text-left text-xs bg-slate-800/60 hover:bg-emerald-500/10 border border-slate-700/50 hover:border-emerald-500/40 px-3 py-2 rounded-xl transition flex items-center justify-between text-slate-300 group";
-                btn.onclick = () => loadArchivedSession(archiveKey, archiveName);
-                btn.innerHTML = `
-                    <span class="truncate font-medium group-hover:text-emerald-400">📁 ${archiveName}</span>
-                    <span class="text-[10px] text-slate-500 bg-slate-900 px-1.5 py-0.5 rounded">ဖတ်ရန်</span>
-                `;
-                archiveContainer.appendChild(btn);
-            }
-        });
+                const div = document.createElement('div');
+                div.className = "w-full bg-slate-800/60 hover:bg-emerald-500/5 border border-slate-700/50 hover:border-emerald-500/30 px-3 py-2 rounded-xl transition flex items-center justify-between gap-2 group";
+                
+                // Content area trigger click to open
+                const titleSpan = document.createElement('span');
+                titleSpan.className = "truncate font-medium group-hover:text-emerald-400 text-xs text-slate-300 cursor-pointer flex-1";
+                titleSpan.innerHTML = `📁 ${archiveName}`;
+                titleSpan.onclick = () => loadArchivedSession(archiveKey, archiveName);
 
-        // --- Load View Functions ---
+                div.appendChild(titleSpan);
+
+                // Delete Archive Folder Button (Visible only to Admin mode)
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = `archive-delete-btn text-rose-400 hover:text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 p-1.5 rounded-lg text-[10px] transition ${isAdmin ? '' : 'hidden'}`;
+                deleteBtn.innerHTML = `🗑️`;
+                deleteBtn.title = "ဖိုင်တစ်ခုလုံး ဖျက်မည်";
+                deleteBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    deleteArchiveFolder(archiveKey, archiveName);
+                };
+
+                div.appendChild(deleteBtn);
+                archiveContainer.appendChild(div);
+            }
+        }
+
+        // --- Session Navigation Actions ---
         function loadActiveSession() {
             isViewingArchive = false;
+            currentArchiveKey = null;
             displayedExpenses = [...activeExpenses];
             
             document.getElementById('currentSessionTitle').innerText = "လတ်တလော စာရင်း";
@@ -278,6 +321,7 @@
 
         function loadArchivedSession(archiveKey, archiveName) {
             isViewingArchive = true;
+            currentArchiveKey = archiveKey;
             
             db.ref('archives/' + archiveKey + '/data').once('value', (snapshot) => {
                 const data = snapshot.val();
@@ -295,14 +339,13 @@
                 document.getElementById('chartContextTitle').innerText = `${archiveName} ၏ ပြဇယား`;
                 document.getElementById('tableContextTitle').innerText = `${archiveName} ၏ မှတ်တမ်းများ`;
                 
-                // Hide input card while viewing history to prevent mistakes
                 document.getElementById('adminFormCard').classList.add('hidden');
 
                 updateUI();
             });
         }
 
-        // --- Update UI View & Charts ---
+        // --- Render UI Data Component ---
         function updateUI() {
             const tbody = document.getElementById('expenseTableBody');
             tbody.innerHTML = '';
@@ -320,15 +363,12 @@
                     const tr = document.createElement('tr');
                     tr.className = "hover:bg-slate-800/40 transition-colors duration-150 border-b border-slate-800/30";
                     
-                    // Show action button only if admin AND in active session mode
-                    const showAction = isAdmin && !isViewingArchive;
-                    
                     tr.innerHTML = `
                         <td class="py-3 px-4 text-xs text-slate-400 font-medium">${toMyanmarNumbers(item.date)}</td>
                         <td class="py-3 px-4 font-semibold text-slate-200">${item.title}</td>
                         <td class="py-3 px-4 text-right font-extrabold text-emerald-400">${formatMyanmarCurrency(item.amount)}</td>
-                        <td class="py-3 px-4 text-center admin-action ${showAction ? '' : 'hidden'}">
-                            <button onclick="deleteExpense('${item.id}')" class="text-red-400 hover:text-red-300 font-bold text-xs bg-red-500/10 hover:bg-red-500/20 px-2 py-1 rounded transition">
+                        <td class="py-3 px-4 text-center admin-action ${isAdmin ? '' : 'hidden'}">
+                            <button onclick="deleteExpense('${item.id}')" class="text-rose-400 hover:text-rose-300 font-bold text-xs bg-rose-500/10 hover:bg-rose-500/20 px-2.5 py-1 rounded-lg transition">
                                 ဖျက်ရန်
                             </button>
                         </td>
@@ -341,16 +381,15 @@
             document.getElementById('perPersonExpense').innerText = formatMyanmarCurrency(Math.round(total / 10));
             document.getElementById('recordCount').innerText = toMyanmarNumbers(displayedExpenses.length) + " ခု";
 
-            // Maintain table layout visibility states
-            if (isAdmin && !isViewingArchive) {
-                document.querySelectorAll('.admin-action').forEach(el => el.classList.remove('hidden'));
-            } else {
-                document.querySelectorAll('.admin-action').forEach(el => el.classList.add('hidden'));
-            }
+            // Structural layout administration check
+            document.querySelectorAll('.admin-action').forEach(el => {
+                isAdmin ? el.classList.remove('hidden') : el.classList.add('hidden');
+            });
 
             renderChart(chartData);
         }
 
+        // --- Analytics Graphic engine ---
         function renderChart(chartData) {
             const sortedDates = Object.keys(chartData).sort((a, b) => new Date(a) - new Date(b));
             const chartLabels = sortedDates.map(d => toMyanmarNumbers(d));
@@ -407,7 +446,7 @@
             });
         }
 
-        // --- Admin Authentication & Controls ---
+        // --- Admin Authentication Security ---
         function toggleAdminMode() {
             if (!isAdmin) {
                 let pass = prompt("Admin Password ကို ရိုက်ထည့်ပါ -");
@@ -427,6 +466,7 @@
                         document.getElementById('visitorNotice').classList.add('hidden');
                         
                         document.querySelectorAll('.admin-action').forEach(el => el.classList.remove('hidden'));
+                        document.querySelectorAll('.archive-delete-btn').forEach(el => el.classList.remove('hidden'));
                     } else {
                         alert("လျှို့ဝှက်နံပါတ် မှားယွင်းနေပါသည်။");
                     }
@@ -443,10 +483,11 @@
                 document.getElementById('visitorNotice').classList.remove('hidden');
                 
                 document.querySelectorAll('.admin-action').forEach(el => el.classList.add('hidden'));
+                document.querySelectorAll('.archive-delete-btn').forEach(el => el.classList.add('hidden'));
             }
         }
 
-        // --- Archive & Session Closer ---
+        // --- Archive Control System (Close Active & Pack File) ---
         function toggleSession() {
             if (!isAdmin) return;
             if (activeExpenses.length === 0) {
@@ -461,11 +502,9 @@
             }
 
             if (confirm(`လက်ရှိဒေတာများကို "${archiveName}" အဖြစ် သိမ်းဆည်းပြီး စာရင်းသစ် ပြန်ဖွင့်ရန် သေချာပါသလား?`)) {
-                // Move active data to archives node
                 const archiveRef = db.ref('archives').push();
-                
-                // Structure data as a complete list format for archives
                 const archiveDataObj = {};
+                
                 activeExpenses.forEach(item => {
                     archiveDataObj[item.id] = {
                         date: item.date,
@@ -479,7 +518,6 @@
                     dateCreated: new Date().toISOString(),
                     data: archiveDataObj
                 }).then(() => {
-                    // Empty the active reference node
                     db.ref('expenses').remove().then(() => {
                         alert(`လက်ရှိစာရင်းကို "${archiveName}" အဖြစ် ပိတ်သိမ်းသိမ်းဆည်းပြီး စာရင်းသစ်တစ်ခု အောင်မြင်စွာ ဖွင့်လိုက်ပါပြီ။`);
                         loadActiveSession();
@@ -490,7 +528,7 @@
             }
         }
 
-        // --- Save Expense Input ---
+        // --- Write Input Action ---
         function saveExpense(e) {
             e.preventDefault();
             if (!isAdmin) return alert("Admin သာလျှင် စာရင်းသွင်းခွင့်ရှိသည်။");
@@ -513,12 +551,39 @@
             });
         }
 
-        // --- Delete Expense ---
+        // --- Destructive Actions (Delete Single Record / Delete Whole Folder Archive) ---
+        // 1. Delete an item from either Active session or Inner Archive folder
         function deleteExpense(id) {
             if (!isAdmin) return alert("Admin သာလျှင် ဖျက်ပိုင်ခွင့်ရှိသည်။");
-            if (isViewingArchive) return alert("စာရင်းဟောင်းများထဲမှ ဒေတာများကို ဖျက်၍မရပါ။");
+            
             if (confirm("ဤအသုံးစရိတ်ကို ဖျက်ရန် သေချာပါသလား?")) {
-                db.ref('expenses/' + id).remove();
+                if (isViewingArchive && currentArchiveKey) {
+                    // Delete dynamic sub-record from specific history folder path
+                    db.ref(`archives/${currentArchiveKey}/data/${id}`).remove()
+                        .then(() => {
+                            alert("စာရင်းဟောင်းထဲမှ ဒေတာကို အောင်မြင်စွာ ဖျက်လိုက်ပါပြီ။");
+                        });
+                } else {
+                    // Delete from active session
+                    db.ref('expenses/' + id).remove();
+                }
+            }
+        }
+
+        // 2. Delete Entire Archive Folder node
+        function deleteArchiveFolder(archiveKey, archiveName) {
+            if (!isAdmin) return alert("Admin သာလျှင် စာရင်းဟောင်းဖိုင်များကို ဖျက်ပိုင်ခွင့်ရှိသည်။");
+            
+            if (confirm(`"${archiveName}" ဖိုင်တစ်ခုလုံးနှင့် ၎င်းအောက်ရှိ စာရင်းမှတ်တမ်းအားလုံးကို လုံးဝဖျက်ပစ်ရန် သေချာပါသလား?\n(မှတ်ချက် - ပြန်လည်ရယူ၍ မရနိုင်ပါ)`)) {
+                db.ref(`archives/${archiveKey}`).remove()
+                    .then(() => {
+                        alert(`"${archiveName}" ဖိုင်ကို အောင်မြင်စွာ ဖျက်ဆီးပြီးပါပြီ။`);
+                        if (currentArchiveKey === archiveKey) {
+                            loadActiveSession();
+                        }
+                    }).catch(err => {
+                        alert("ဖျက်ဆီးရာတွင် အမှားအယွင်းရှိခဲ့သည် - " + err.message);
+                    });
             }
         }
     </script>
