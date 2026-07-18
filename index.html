@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Statement of expenses</title>
+    <title>SaaS Expense Analytics Dashboard</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -12,12 +12,16 @@
             theme: {
                 extend: {
                     colors: {
-                        brand: {
-                            50: '#f0fdf4',
-                            100: '#dcfce7',
-                            500: '#22c55e',
-                            600: '#16a34a',
-                            900: '#14532d',
+                        slate: {
+                            950: '#030712',
+                            900: '#0b0f19',
+                            800: '#1f293d',
+                            700: '#334155'
+                        },
+                        emerald: {
+                            400: '#34d399',
+                            500: '#10b981',
+                            650: '#059669'
                         }
                     }
                 }
@@ -27,177 +31,225 @@
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&family=Kohit&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Padauk:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Padauk', 'Kohit', sans-serif;
-            background: radial-gradient(circle at top, #1e293b, #0f172a);
+            font-family: 'Plus Jakarta Sans', 'Padauk', sans-serif;
+            background: linear-gradient(135deg, #030712 0%, #080f1e 50%, #0c182e 100%);
         }
-        /* Custom Scrollbar for better look */
-        ::-webkit-scrollbar {
-            width: 6px;
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.45);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.04);
         }
-        ::-webkit-scrollbar-track {
-            background: #1e293b;
+        .active-sidebar-item {
+            background: linear-gradient(90deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.02) 100%);
+            border-left: 3px solid #10b981;
+            color: #34d399;
         }
-        ::-webkit-scrollbar-thumb {
-            background: #334155;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #475569;
-        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #1f293d; border-radius: 99px; }
+        ::-webkit-scrollbar-thumb:hover { background: #334155; }
     </style>
 </head>
-<body class="text-slate-100 min-h-screen pb-12 antialiased">
+<body class="text-slate-100 min-h-screen antialiased flex flex-col lg:flex-row overflow-x-hidden">
 
-    <!-- Top Navigation Bar -->
-    <nav class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50 px-4 py-3">
-        <div class="max-w-6xl mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-green-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                    <span class="text-white font-bold text-xl">💸</span>
-                </div>
-                <div>
-                    <h1 class="text-lg font-bold tracking-wide">Statement of expenses</h1>
-                    <p class="text-xs text-slate-400">Accounting System</p>
-                </div>
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="w-full lg:w-64 bg-slate-950/80 border-b lg:border-b-0 lg:border-r border-slate-800/60 backdrop-blur-xl flex flex-col p-5 sticky top-0 z-40 lg:h-screen">
+        <!-- Logo Header -->
+        <div class="flex items-center gap-3 mb-8">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                <span class="text-white font-bold text-lg">📊</span>
             </div>
-            
-            <div class="flex items-center gap-2">
-                <!-- Admin Close/Open Session Button -->
-                <button id="sessionCtrlBtn" onclick="toggleSession()" class="hidden px-3.5 py-2 text-xs font-bold rounded-xl transition-all duration-200 border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500 hover:text-slate-950 text-rose-400 flex items-center gap-1.5">
+            <div>
+                <h1 class="text-sm font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">EXPENSE HUB</h1>
+                <p class="text-[10px] text-emerald-400 font-semibold tracking-widest uppercase">V2 PRO SYSTEM</p>
+            </div>
+        </div>
+
+        <!-- Navigation Menu Items -->
+        <nav class="flex flex-row lg:flex-col gap-1 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0 border-b border-slate-800/50 lg:border-b-0">
+            <button onclick="switchView('dashboard-view')" id="nav-dashboard-view" class="active-sidebar-item flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-200 hover:text-emerald-400 w-full text-left">
+                <span>📈</span> ခြုံငုံသုံးသပ်ချက် ပြဇယား
+            </button>
+            <button onclick="switchView('input-view')" id="nav-input-view" class="flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold text-slate-400 whitespace-nowrap transition-all duration-200 hover:text-emerald-400 w-full text-left">
+                <span>📝</span> အသုံးစရိတ်အသစ် သွင်းရန်
+            </button>
+            <button onclick="switchView('archive-view')" id="nav-archive-view" class="flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold text-slate-400 whitespace-nowrap transition-all duration-200 hover:text-emerald-400 w-full text-left">
+                <span>📁</span> သိမ်းဆည်းထားသောဖိုင်များ
+            </button>
+        </nav>
+
+        <!-- Sidebar Footer Action (Admin Space) -->
+        <div class="mt-auto pt-4 hidden lg:block border-t border-slate-900">
+            <div class="rounded-xl bg-slate-900/50 p-3 border border-slate-800/40 flex items-center justify-between">
+                <div class="truncate mr-2">
+                    <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Access Level</p>
+                    <p id="sidebarAdminStatus" class="text-xs font-semibold text-slate-400 truncate">Visitor Mode</p>
+                </div>
+                <button id="adminBtn" onclick="openAuthModal()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 flex items-center justify-center transition border border-slate-700">
+                    <span id="lockIcon">🔒</span>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <div class="flex-1 flex flex-col min-w-0 max-h-screen overflow-y-auto">
+        
+        <!-- TOP CONTROLLER HEADER BAR -->
+        <header class="glass-panel sticky top-0 z-30 px-6 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+                <div class="flex items-center gap-2">
+                    <h2 id="view-title" class="text-lg font-bold tracking-tight text-white">ဒေတာ ခြုံငုံသုံးသပ်ချက်</h2>
+                    <span id="archiveLabel" class="hidden text-[10px] tracking-wide font-extrabold px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 uppercase animate-pulse">စာရင်းဟောင်း</span>
+                </div>
+                <p id="view-subtitle" class="text-xs text-slate-400 mt-0.5">လက်ရှိ ကြည့်ရှုနေသောဖိုင် - <span id="currentSessionTitle" class="text-emerald-400 font-bold">လတ်တလော စာရင်း</span></p>
+            </div>
+
+            <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+                <button id="backToActiveBtn" onclick="loadActiveSession()" class="hidden px-3.5 py-2 text-xs font-semibold rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 transition flex items-center gap-1.5 shadow-md">
+                    🔄 <span>လတ်တလောစာရင်းသို့ ပြန်မည်</span>
+                </button>
+                <button id="sessionCtrlBtn" onclick="toggleSession()" class="hidden px-3.5 py-2 text-xs font-bold rounded-xl transition border border-rose-500/20 bg-rose-500/10 hover:bg-rose-500 hover:text-slate-950 text-rose-400 flex items-center gap-1.5 shadow-md shadow-rose-500/5">
                     🗃️ <span>လက်ရှိစာရင်း ပိတ်သိမ်းမည်</span>
                 </button>
-                <!-- Admin Authorization Button -->
-                <button id="adminBtn" onclick="toggleAdminMode()" class="px-4 py-2 text-xs font-semibold rounded-xl transition-all duration-200 border border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center gap-2">
-                    <span id="lockIcon">🔒</span> <span id="adminBtnText">Admin ဝင်မည်</span>
+                <!-- Mobile Only Access Lock -->
+                <button onclick="openAuthModal()" class="lg:hidden px-3 py-2 rounded-xl bg-slate-800 text-xs font-medium border border-slate-700 flex items-center gap-1">
+                    <span id="lockIconMob">🔒</span> <span id="adminBtnTextMob">Admin</span>
                 </button>
             </div>
-        </div>
-    </nav>
+        </header>
 
-    <!-- Main Content Area -->
-    <main class="max-w-6xl mx-auto px-4 mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        <!-- Left Column: Context Badges, Summaries, Folders & Form -->
-        <div class="lg:col-span-1 flex flex-col gap-6">
-            
-            <!-- Active Session/Selected File Badge -->
-            <div class="rounded-2xl bg-slate-900/80 border border-slate-800 p-4 shadow-xl">
-                <p class="text-xs text-slate-500">လက်ရှိ ကြည့်ရှုနေသော စာရင်းဖိုင်</p>
-                <div class="flex items-center justify-between mt-1">
-                    <span id="currentSessionTitle" class="text-sm font-extrabold text-emerald-400">လတ်တလော စာရင်း</span>
-                    <span id="archiveLabel" class="hidden text-[10px] uppercase font-bold px-2 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/30 text-amber-400">စာရင်းဟောင်း</span>
+        <!-- MAIN LAYOUT VIEWS CONTROLLER CONTAINER -->
+        <main class="p-6 max-w-6xl w-full mx-auto space-y-6 flex-1">
+
+            <!-- STATISTIC SUMMARY CARDS BLOCK (Always Visible on Top) -->
+            <section class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <div class="glass-panel rounded-2xl p-5 relative overflow-hidden group shadow-xl">
+                    <div class="absolute right-0 top-0 -mt-3 -mr-3 w-20 h-20 bg-emerald-500/5 rounded-full blur-xl group-hover:bg-emerald-500/10 transition-all duration-300"></div>
+                    <div class="flex items-center justify-between">
+                        <p class="text-xs text-slate-400 font-semibold tracking-wide">စုစုပေါင်း ကုန်ကျစရိတ်</p>
+                        <span class="text-lg">💰</span>
+                    </div>
+                    <h3 class="text-2xl font-black text-emerald-400 mt-2 tracking-tight" id="totalExpense">၀ ကျပ်</h3>
                 </div>
-                <button id="backToActiveBtn" onclick="loadActiveSession()" class="hidden w-full mt-3 text-center text-xs text-slate-300 bg-slate-800 hover:bg-slate-700 py-2 rounded-lg border border-slate-700 transition font-medium">
-                    🔄 လတ်တလော စာရင်းသို့ ပြန်သွားမည်
-                </button>
-            </div>
-
-            <!-- Summary Card -->
-            <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-800 p-6 shadow-xl">
-                <div class="absolute right-0 top-0 -mt-4 -mr-4 w-24 h-24 bg-emerald-500/10 rounded-full blur-xl"></div>
-                <p class="text-sm text-slate-400">စုစုပေါင်း ကုန်ကျစရိတ်</p>
-                <h3 class="text-3xl font-extrabold text-emerald-400 mt-2" id="totalExpense">၀ ကျပ်</h3>
-                <div class="mt-4 pt-4 border-t border-slate-800/80 flex justify-between text-xs text-slate-400">
-                    <span>တစ်ယောက်ချင်းစီ ကျသင့်ငွေ (၁၀ ဦးစာ):</span>
-                    <span class="font-semibold text-slate-200" id="perPersonExpense">၀ ကျပ်</span>
+                <div class="glass-panel rounded-2xl p-5 relative overflow-hidden group shadow-xl">
+                    <div class="absolute right-0 top-0 -mt-3 -mr-3 w-20 h-20 bg-blue-500/5 rounded-full blur-xl group-hover:bg-blue-500/10 transition-all duration-300"></div>
+                    <div class="flex items-center justify-between">
+                        <p class="text-xs text-slate-400 font-semibold tracking-wide">တစ်ယောက်ချင်းစီ ကျသင့်ငွေ</p>
+                        <span class="text-lg">👤</span>
+                    </div>
+                    <h3 class="text-2xl font-black text-slate-100 mt-2 tracking-tight" id="perPersonExpense">၀ ကျပ်</h3>
                 </div>
-            </div>
-
-            <!-- History Archive File List -->
-            <div class="rounded-2xl bg-slate-900/50 border border-slate-800 p-5 shadow-xl">
-                <h3 class="text-xs font-bold text-slate-400 mb-3 flex items-center gap-1.5">
-                    📁 <span>သိမ်းဆည်းထားသော စာရင်းဖိုင်များ</span>
-                </h3>
-                <div id="archiveList" class="space-y-2 max-h-48 overflow-y-auto pr-1">
-                    <p class="text-[11px] text-slate-600 text-center py-2">သိမ်းဆည်းထားသော ဖိုင်မရှိသေးပါ။</p>
+                <div class="glass-panel rounded-2xl p-5 relative overflow-hidden group shadow-xl">
+                    <div class="absolute right-0 top-0 -mt-3 -mr-3 w-20 h-20 bg-purple-500/5 rounded-full blur-xl group-hover:bg-purple-500/10 transition-all duration-300"></div>
+                    <div class="flex items-center justify-between">
+                        <p class="text-xs text-slate-400 font-semibold tracking-wide">စုစုပေါင်း မှတ်တမ်းအရေအတွက်</p>
+                        <span class="text-lg">📝</span>
+                    </div>
+                    <h3 class="text-2xl font-black text-slate-100 mt-2 tracking-tight" id="recordCount">၀ ခု</h3>
                 </div>
-            </div>
+            </section>
 
-            <!-- Admin Input Form -->
-            <div id="adminFormCard" class="hidden rounded-2xl bg-slate-900/50 backdrop-blur-md border border-emerald-500/30 p-6 shadow-xl transition-all duration-300">
-                <div class="flex items-center gap-2 mb-4">
-                    <span class="text-emerald-400">📝</span>
-                    <h2 class="text-base font-bold text-slate-100">အသုံးစရိတ်အသစ် ထည့်သွင်းရန်</h2>
+            <!-- VIEW 1: DASHBOARD VIEW (Default Grid Analytics) -->
+            <div id="dashboard-view" class="view-panel grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Visual Chart Dynamic Graphics -->
+                <div class="lg:col-span-3 glass-panel rounded-2xl p-5 shadow-2xl border border-slate-800/40">
+                    <div class="h-72 relative">
+                        <canvas id="expenseChart"></canvas>
+                    </div>
                 </div>
                 
-                <form id="expenseForm" onsubmit="saveExpense(event)" class="space-y-4">
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1.5">ရက်စွဲ</label>
-                        <input type="date" id="expDate" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-slate-100 focus:outline-none focus:border-emerald-500">
+                <!-- Table Expense Lists Records Box -->
+                <div class="lg:col-span-3 glass-panel rounded-2xl p-6 shadow-2xl border border-slate-800/40 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs text-slate-300 border-collapse">
+                            <thead>
+                                <tr class="text-slate-400 uppercase tracking-wider border-b border-slate-800/60 bg-slate-900/40 rounded-xl">
+                                    <th class="py-3.5 px-4 font-bold">ရက်စွဲ</th>
+                                    <th class="py-3.5 px-4 font-bold">အကြောင်းအရာ</th>
+                                    <th class="py-3.5 px-4 font-bold text-right">ကျသင့်ငွေ</th>
+                                    <th class="py-3.5 px-4 font-bold text-center admin-action hidden">လုပ်ဆောင်ချက်</th>
+                                </tr>
+                            </thead>
+                            <tbody id="expenseTableBody" class="divide-y divide-slate-800/30">
+                                <!-- Loaded dynamically via JS code -->
+                            </tbody>
+                        </table>
                     </div>
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1.5">အသုံးပြုသည့် အကြောင်းအရာ</label>
-                        <input type="text" id="expTitle" placeholder="ဥပမာ - နေ့လည်စာ စားစရိတ်" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1.5">ကျသင့်ငွေ (ကျပ်)</label>
-                        <input type="number" id="expAmount" placeholder="ဥပမာ - ၁၅၀၀၀" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500">
-                    </div>
-                    <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 active:scale-95 transition text-slate-950 font-bold text-sm py-2.5 rounded-xl shadow-lg shadow-emerald-500/20">
-                        သိမ်းဆည်းမည်
-                    </button>
-                </form>
+                </div>
             </div>
 
-            <div id="visitorNotice" class="rounded-2xl bg-slate-900/40 border border-slate-800/80 p-5 text-center text-xs text-slate-400">
-                စာရင်းများကို အချိန်မရွေး တိုက်ရိုက် ကြည့်ရှုနိုင်ပါသည်။
+            <!-- VIEW 2: FORM CONTROL INPUT VIEW -->
+            <div id="input-view" class="view-panel hidden max-w-xl mx-auto">
+                <div class="glass-panel rounded-2xl p-6 shadow-2xl border border-emerald-500/10 relative">
+                    <div class="visitor-lock-overlay absolute inset-0 bg-slate-950/80 backdrop-blur-md rounded-2xl flex flex-col items-center justify-center text-center p-6 z-20 transition-all duration-300">
+                        <span class="text-3xl mb-3">🔒</span>
+                        <h4 class="text-sm font-bold text-slate-200">Admin တိုက်ရိုက်ဝင်ရောက်ရန် လိုအပ်သည်</h4>
+                        <p class="text-xs text-slate-500 max-w-xs mt-1">စာရင်းအချက်အလက်အသစ်များ ထည့်သွင်းနိုင်ရန်အတွက် ဦးစွာ Admin Access လုပ်ပိုင်ခွင့်ကို ရယူပါ။</p>
+                        <button onclick="openAuthModal()" class="mt-4 px-4 py-2 text-xs font-bold rounded-xl bg-emerald-500 text-slate-950 hover:bg-emerald-600 transition shadow-lg shadow-emerald-500/10">Admin လုပ်ပိုင်ခွင့်တောင်းမည်</button>
+                    </div>
+
+                    <form id="expenseForm" onsubmit="saveExpense(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 mb-1.5">ရက်စွဲ ရွေးချယ်ရန်</label>
+                            <input type="date" id="expDate" required class="w-full bg-slate-900/60 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500 transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 mb-1.5">အသုံးပြုသည့် အကြောင်းအရာကိစ္စ</label>
+                            <input type="text" id="expTitle" placeholder="ဥပမာ - ဆိုင်ကယ်ဆီဖိုး" required class="w-full bg-slate-900/60 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 mb-1.5">ကျသင့်ငွေပမာဏ (ကျပ်)</label>
+                            <input type="number" id="expAmount" placeholder="ဥပမာ - ၅၀၀၀" required class="w-full bg-slate-900/60 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition">
+                        </div>
+                        <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 transition text-slate-950 font-bold text-xs py-3 rounded-xl shadow-xl shadow-emerald-500/10 active:scale-[0.98]">
+                            ဒေတာသိမ်းဆည်းသိမ်းဆည်းမည်
+                        </button>
+                    </form>
+                </div>
             </div>
 
-        </div>
+            <!-- VIEW 3: ARCHIVES FOLDERS VIEW SYSTEM -->
+            <div id="archive-view" class="view-panel hidden">
+                <div class="glass-panel rounded-2xl p-6 shadow-2xl border border-slate-800/40">
+                    <p class="text-xs text-slate-400 font-medium mb-4">သီးသန့်ပိတ်သိမ်း သိမ်းဆည်းခဲ့သော သမိုင်းဝင်စာရင်းတွဲများ -</p>
+                    <div id="archiveList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Loaded dynamically -->
+                    </div>
+                </div>
+            </div>
 
-        <!-- Right Column: Graphs & Detailed Lists -->
-        <div class="lg:col-span-2 flex flex-col gap-6">
+        </main>
+    </div>
+
+    <!-- CUSTOM AUTHENTICATION MODAL (REPLACES BROWSER PROMPT) -->
+    <div id="authModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md hidden transition-all duration-300 opacity-0">
+        <div class="glass-panel w-full max-w-sm rounded-2xl p-6 shadow-2xl border border-slate-800/60 transform scale-95 transition-all duration-300" id="authModalContainer">
+            <h3 id="modalAuthHeader" class="text-sm font-bold text-slate-200 flex items-center gap-2">🔒 Admin စစ်ဆေးခြင်း</h3>
+            <p id="modalAuthDesc" class="text-xs text-slate-400 mt-1">စနစ်အတွင်း ဒေတာအပြောင်းအလဲလုပ်ရန် လျှို့ဝှက်ကုဒ် လိုအပ်ပါသည်။</p>
             
-            <!-- Visual Chart Card -->
-            <div class="rounded-2xl bg-slate-900/50 border border-slate-800 p-6 shadow-xl">
-                <h3 class="text-sm font-bold text-slate-300 mb-4 flex items-center gap-2">
-                    📊 <span id="chartContextTitle">နေ့စဉ် အသုံးစရိတ် လှုပ်ရှားမှုပြဇယား</span>
-                </h3>
-                <div class="h-64 relative">
-                    <canvas id="expenseChart"></canvas>
-                </div>
+            <div class="mt-4" id="passwordInputWrapper">
+                <input type="password" id="adminPassInput" placeholder="••••••" class="w-full tracking-widest text-center bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-emerald-500">
             </div>
 
-            <!-- Expense List Table -->
-            <div class="rounded-2xl bg-slate-900/50 border border-slate-800 p-6 shadow-xl overflow-hidden">
-                <div class="flex flex-wrap justify-between items-center gap-2 mb-4">
-                    <h3 class="text-sm font-bold text-slate-300 flex items-center gap-2">
-                        📜 <span id="tableContextTitle">အသုံးစရိတ်မှတ်တမ်းများ</span>
-                    </h3>
-                    <div>
-                        <span class="text-xs bg-slate-800 text-slate-400 px-2.5 py-1 rounded-full border border-slate-700" id="recordCount">၀ ခု</span>
-                    </div>
-                </div>
-
-                <div class="overflow-x-auto" id="expense-table-container">
-                    <table class="w-full text-left text-sm text-slate-300 border-collapse">
-                        <thead>
-                            <tr class="border-b border-slate-800 text-slate-400 text-xs uppercase tracking-wider bg-slate-800/30">
-                                <th class="py-3 px-4 font-semibold">ရက်စွဲ</th>
-                                <th class="py-3 px-4 font-semibold">အကြောင်းအရာ</th>
-                                <th class="py-3 px-4 font-semibold text-right">ကျသင့်ငွေ</th>
-                                <th class="py-3 px-4 font-semibold text-center admin-action hidden">လုပ်ဆောင်ချက်</th>
-                            </tr>
-                        </thead>
-                        <tbody id="expenseTableBody" class="divide-y divide-slate-800/50">
-                            <!-- Loaded Dynamically -->
-                        </tbody>
-                    </table>
-                </div>
+            <div class="flex items-center gap-2 mt-5">
+                <button onclick="closeAuthModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs py-2.5 rounded-xl border border-slate-700 transition">ပယ်ဖျက်မည်</button>
+                <button id="modalActionBtn" onclick="handleAuthSubmit()" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-slate-950 text-xs font-bold py-2.5 rounded-xl transition">ဝင်ရောက်မည်</button>
             </div>
-
         </div>
-    </main>
+    </div>
 
-    <!-- Firebase SDK -->
+    <!-- Firebase SDK Code Setup Layer -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
     <script>
-        // --- Firebase Configuration ---
+        // --- Firebase Config Data Block ---
         const firebaseConfig = {
             apiKey: "AIzaSyBiLX6RXHbI9bY-DA_ATyXoVgG_bedSu-4",
             authDomain: "my-group-project4.firebaseapp.com",
@@ -216,93 +268,163 @@
         let displayedExpenses = [];
         let expenseChartInstance = null;
         let isViewingArchive = false;
-        let currentArchiveKey = null; // Track current viewing archive folder
+        let currentArchiveKey = null;
         
         const ADMIN_PASSWORD = "205428"; 
-
         document.getElementById('expDate').valueAsDate = new Date();
 
-        // --- Myanmar Numbers Converter ---
+        // --- Core Multi-View Switcher Logic ---
+        function switchView(viewId) {
+            document.querySelectorAll('.view-panel').forEach(panel => panel.classList.add('hidden'));
+            document.getElementById(viewId).classList.remove('hidden');
+
+            document.querySelectorAll('nav button').forEach(btn => {
+                btn.classList.remove('active-sidebar-item');
+                btn.classList.add('text-slate-400');
+            });
+            document.getElementById(`nav-${viewId}`).classList.add('active-sidebar-item');
+            document.getElementById(`nav-${viewId}`).classList.remove('text-slate-400');
+
+            // Dynamic header titles adjustments
+            const titles = {
+                'dashboard-view': 'ဒေတာ ခြုံငုံသုံးသပ်ချက်',
+                'input-view': 'အသုံးစရိတ်အသစ် ထည့်သွင်းခြင်း',
+                'archive-view': 'သိမ်းဆည်းထားသော ဖိုင်တွဲများ'
+            };
+            document.getElementById('view-title').innerText = titles[viewId];
+        }
+
+        // --- Custom Authentication Modal Framework ---
+        function openAuthModal() {
+            const modal = document.getElementById('authModal');
+            const box = document.getElementById('authModalContainer');
+            
+            if(isAdmin) {
+                // Logout immediately if clicked while logged in
+                processLogout();
+                return;
+            }
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                box.classList.remove('scale-95');
+            }, 50);
+            document.getElementById('adminPassInput').focus();
+        }
+
+        function closeAuthModal() {
+            const modal = document.getElementById('authModal');
+            const box = document.getElementById('authModalContainer');
+            modal.classList.add('opacity-0');
+            box.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.getElementById('adminPassInput').value = '';
+            }, 300);
+        }
+
+        function handleAuthSubmit() {
+            const passInput = document.getElementById('adminPassInput').value.trim();
+            if (passInput === ADMIN_PASSWORD || Number(passInput) === 205428) {
+                processLoginSuccess();
+            } else {
+                alert("လျှို့ဝှက်နံပါတ် မှားယွင်းနေပါသည်။");
+            }
+        }
+
+        function processLoginSuccess() {
+            isAdmin = true;
+            closeAuthModal();
+            
+            // Adjust UI States
+            document.getElementById('lockIcon').innerText = "🔓";
+            document.getElementById('lockIconMob').innerText = "🔓";
+            document.getElementById('sidebarAdminStatus').innerText = "Admin Authorized";
+            document.getElementById('sidebarAdminStatus').classList.replace('text-slate-400', 'text-emerald-400');
+            
+            document.querySelectorAll('.visitor-lock-overlay').forEach(el => el.classList.add('hidden'));
+            document.getElementById('sessionCtrlBtn').classList.remove('hidden');
+            
+            updateUI();
+        }
+
+        function processLogout() {
+            isAdmin = false;
+            document.getElementById('lockIcon').innerText = "🔒";
+            document.getElementById('lockIconMob').innerText = "🔒";
+            document.getElementById('sidebarAdminStatus').innerText = "Visitor Mode";
+            document.getElementById('sidebarAdminStatus').classList.replace('text-emerald-400', 'text-slate-400');
+            
+            document.querySelectorAll('.visitor-lock-overlay').forEach(el => el.classList.remove('hidden'));
+            document.getElementById('sessionCtrlBtn').classList.add('hidden');
+            
+            updateUI();
+        }
+
+        // --- Myanmar Numbers Converter Utilities ---
         function toMyanmarNumbers(num) {
             const mmNumbers = ['၀', '၁', '၂', '၃', '၄', '၅', '၆', '၇', '၈', '၉'];
-            return num.toString().replace(/[0-9]/g, function (w) {
-                return mmNumbers[+w];
-            });
+            return num.toString().replace(/[0-9]/g, function (w) { return mmNumbers[+w]; });
         }
 
         function formatMyanmarCurrency(amount) {
             return toMyanmarNumbers(Number(amount).toLocaleString('en-US')) + " ကျပ်";
         }
 
-        // --- Real-time Data Synchronization ---
-        // 1. Listen to Current Active Expenses
+        // --- Real-time Firebase Listeners Sync Blocks ---
         db.ref('expenses').on('value', (snapshot) => {
             const data = snapshot.val();
             activeExpenses = [];
             if (data) {
-                for (let key in data) {
-                    activeExpenses.push({ id: key, ...data[key] });
-                }
+                for (let key in data) { activeExpenses.push({ id: key, ...data[key] }); }
                 activeExpenses.sort((a, b) => new Date(b.date) - new Date(a.date));
             }
-            if (!isViewingArchive) {
-                loadActiveSession();
-            }
+            if (!isViewingArchive) { loadActiveSession(); }
         });
 
-        // 2. Listen to Archives (Saved Folders List)
         db.ref('archives').on('value', (snapshot) => {
-            renderArchiveList(snapshot.val());
-            // If viewing archive, update UI data dynamically on deletion/modifications
+            renderArchivesGrid(snapshot.val());
             if (isViewingArchive && currentArchiveKey) {
                 const archiveData = snapshot.val();
                 if (archiveData && archiveData[currentArchiveKey]) {
                     loadArchivedSession(currentArchiveKey, archiveData[currentArchiveKey].name);
                 } else {
-                    loadActiveSession(); // Go back to active if archive deleted
+                    loadActiveSession();
                 }
             }
         });
 
-        // --- Render Archive Navigation Side-Panel ---
-        function renderArchiveList(archives) {
-            const archiveContainer = document.getElementById('archiveList');
-            archiveContainer.innerHTML = '';
+        // --- Render Archives Grid System ---
+        function renderArchivesGrid(archives) {
+            const container = document.getElementById('archiveList');
+            container.innerHTML = '';
 
             if (!archives) {
-                archiveContainer.innerHTML = `<p class="text-[11px] text-slate-600 text-center py-2">သိမ်းဆည်းထားသော ဖိုင်မရှိသေးပါ။</p>`;
+                container.innerHTML = `<div class="col-span-full text-center py-8 text-xs text-slate-500">သိမ်းဆည်းထားသော ဖိုင်တွဲဗဟိုချက် မရှိသေးပါ။</div>`;
                 return;
             }
 
             for (let archiveKey in archives) {
                 const archiveName = archives[archiveKey].name;
-                const div = document.createElement('div');
-                div.className = "w-full bg-slate-800/60 hover:bg-emerald-500/5 border border-slate-700/50 hover:border-emerald-500/30 px-3 py-2 rounded-xl transition flex items-center justify-between gap-2 group";
+                const card = document.createElement('div');
+                card.className = "bg-slate-900/60 border border-slate-800 p-4 rounded-xl flex flex-col justify-between gap-4 hover:border-emerald-500/30 transition duration-300 relative group";
                 
-                // Content area trigger click to open
-                const titleSpan = document.createElement('span');
-                titleSpan.className = "truncate font-medium group-hover:text-emerald-400 text-xs text-slate-300 cursor-pointer flex-1";
-                titleSpan.innerHTML = `📁 ${archiveName}`;
-                titleSpan.onclick = () => loadArchivedSession(archiveKey, archiveName);
-
-                div.appendChild(titleSpan);
-
-                // Delete Archive Folder Button (Visible only to Admin mode)
-                const deleteBtn = document.createElement('button');
-                deleteBtn.className = `archive-delete-btn text-rose-400 hover:text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 p-1.5 rounded-lg text-[10px] transition ${isAdmin ? '' : 'hidden'}`;
-                deleteBtn.innerHTML = `🗑️`;
-                deleteBtn.title = "ဖိုင်တစ်ခုလုံး ဖျက်မည်";
-                deleteBtn.onclick = (e) => {
-                    e.stopPropagation();
-                    deleteArchiveFolder(archiveKey, archiveName);
-                };
-
-                div.appendChild(deleteBtn);
-                archiveContainer.appendChild(div);
+                card.innerHTML = `
+                    <div class="cursor-pointer flex-1" onclick="loadArchivedSession('${archiveKey}', '${archiveName}')">
+                        <div class="text-xl">📁</div>
+                        <h4 class="text-xs font-bold text-slate-200 mt-2 truncate group-hover:text-emerald-400 transition">${archiveName}</h4>
+                        <p class="text-[10px] text-slate-500 mt-0.5">Click ဖတ်ရှုရန်</p>
+                    </div>
+                    <button onclick="deleteArchiveFolder('${archiveKey}', '${archiveName}')" class="archive-delete-btn absolute bottom-3 right-3 p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500 text-rose-400 hover:text-slate-950 text-xs transition border border-rose-500/10 ${isAdmin ? '' : 'hidden'}">
+                        🗑️
+                    </button>
+                `;
+                container.appendChild(card);
             }
         }
 
-        // --- Session Navigation Actions ---
+        // --- Data Control Engine Blocks ---
         function loadActiveSession() {
             isViewingArchive = false;
             currentArchiveKey = null;
@@ -311,11 +433,7 @@
             document.getElementById('currentSessionTitle').innerText = "လတ်တလော စာရင်း";
             document.getElementById('archiveLabel').classList.add('hidden');
             document.getElementById('backToActiveBtn').classList.add('hidden');
-            document.getElementById('chartContextTitle').innerText = "နေ့စဉ် အသုံးစရိတ် လှုပ်ရှားမှုပြဇယား";
-            document.getElementById('tableContextTitle').innerText = "အသုံးစရိတ်မှတ်တမ်းများ";
             
-            if (isAdmin) document.getElementById('adminFormCard').classList.remove('hidden');
-
             updateUI();
         }
 
@@ -327,49 +445,41 @@
                 const data = snapshot.val();
                 displayedExpenses = [];
                 if (data) {
-                    for (let key in data) {
-                        displayedExpenses.push({ id: key, ...data[key] });
-                    }
+                    for (let key in data) { displayedExpenses.push({ id: key, ...data[key] }); }
                     displayedExpenses.sort((a, b) => new Date(b.date) - new Date(a.date));
                 }
 
                 document.getElementById('currentSessionTitle').innerText = archiveName;
                 document.getElementById('archiveLabel').classList.remove('hidden');
                 document.getElementById('backToActiveBtn').classList.remove('hidden');
-                document.getElementById('chartContextTitle').innerText = `${archiveName} ၏ ပြဇယား`;
-                document.getElementById('tableContextTitle').innerText = `${archiveName} ၏ မှတ်တမ်းများ`;
                 
-                document.getElementById('adminFormCard').classList.add('hidden');
-
+                switchView('dashboard-view');
                 updateUI();
             });
         }
 
-        // --- Render UI Data Component ---
         function updateUI() {
             const tbody = document.getElementById('expenseTableBody');
             tbody.innerHTML = '';
-
             let total = 0;
             const chartData = {};
 
             if (displayedExpenses.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="py-8 text-center text-slate-500 text-xs">ပြသစရာ စာရင်းမရှိသေးပါ။</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="4" class="py-12 text-center text-slate-500 text-xs">ပြသစရာ ဒေတာ အချက်အလက် မရှိသေးပါ။</td></tr>`;
             } else {
                 displayedExpenses.forEach(item => {
                     total += Number(item.amount);
                     chartData[item.date] = (chartData[item.date] || 0) + Number(item.amount);
 
                     const tr = document.createElement('tr');
-                    tr.className = "hover:bg-slate-800/40 transition-colors duration-150 border-b border-slate-800/30";
-                    
+                    tr.className = "hover:bg-slate-800/20 transition border-b border-slate-900";
                     tr.innerHTML = `
-                        <td class="py-3 px-4 text-xs text-slate-400 font-medium">${toMyanmarNumbers(item.date)}</td>
-                        <td class="py-3 px-4 font-semibold text-slate-200">${item.title}</td>
-                        <td class="py-3 px-4 text-right font-extrabold text-emerald-400">${formatMyanmarCurrency(item.amount)}</td>
-                        <td class="py-3 px-4 text-center admin-action ${isAdmin ? '' : 'hidden'}">
-                            <button onclick="deleteExpense('${item.id}')" class="text-rose-400 hover:text-rose-300 font-bold text-xs bg-rose-500/10 hover:bg-rose-500/20 px-2.5 py-1 rounded-lg transition">
-                                ဖျက်ရန်
+                        <td class="py-3.5 px-4 text-slate-400 font-medium">${toMyanmarNumbers(item.date)}</td>
+                        <td class="py-3.5 px-4 font-semibold text-slate-200">${item.title}</td>
+                        <td class="py-3.5 px-4 text-right font-bold text-emerald-400">${formatMyanmarCurrency(item.amount)}</td>
+                        <td class="py-3.5 px-4 text-center admin-action ${isAdmin ? '' : 'hidden'}">
+                            <button onclick="deleteExpense('${item.id}')" class="text-rose-400 hover:text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 px-2 py-1 rounded-md transition font-bold">
+                                ဖျက်မည်
                             </button>
                         </td>
                     `;
@@ -381,28 +491,23 @@
             document.getElementById('perPersonExpense').innerText = formatMyanmarCurrency(Math.round(total / 10));
             document.getElementById('recordCount').innerText = toMyanmarNumbers(displayedExpenses.length) + " ခု";
 
-            // Structural layout administration check
-            document.querySelectorAll('.admin-action').forEach(el => {
-                isAdmin ? el.classList.remove('hidden') : el.classList.add('hidden');
-            });
+            document.querySelectorAll('.admin-action').forEach(el => { isAdmin ? el.classList.remove('hidden') : el.classList.add('hidden'); });
+            document.querySelectorAll('.archive-delete-btn').forEach(el => { isAdmin ? el.classList.remove('hidden') : el.classList.add('hidden'); });
 
             renderChart(chartData);
         }
 
-        // --- Analytics Graphic engine ---
         function renderChart(chartData) {
             const sortedDates = Object.keys(chartData).sort((a, b) => new Date(a) - new Date(b));
             const chartLabels = sortedDates.map(d => toMyanmarNumbers(d));
             const chartValues = sortedDates.map(d => chartData[d]);
 
-            if (expenseChartInstance) {
-                expenseChartInstance.destroy();
-            }
+            if (expenseChartInstance) { expenseChartInstance.destroy(); }
 
             const ctx = document.getElementById('expenseChart').getContext('2d');
             const gradient = ctx.createLinearGradient(0, 0, 0, 250);
-            gradient.addColorStop(0, 'rgba(34, 197, 94, 0.35)');
-            gradient.addColorStop(1, 'rgba(34, 197, 94, 0.00)');
+            gradient.addColorStop(0, 'rgba(16, 185, 129, 0.25)');
+            gradient.addColorStop(1, 'rgba(16, 185, 129, 0.00)');
 
             expenseChartInstance = new Chart(ctx, {
                 type: 'line',
@@ -410,16 +515,14 @@
                     labels: chartLabels,
                     datasets: [{
                         data: chartValues,
-                        borderColor: '#22c55e',
+                        borderColor: '#10b981',
                         backgroundColor: gradient,
                         borderWidth: 3,
                         fill: true,
-                        tension: 0.35,
-                        pointRadius: 5,
-                        pointHoverRadius: 7,
-                        pointBackgroundColor: '#22c55e',
-                        pointBorderColor: '#0f172a',
-                        pointBorderWidth: 2,
+                        tension: 0.3,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: '#10b981'
                     }]
                 },
                 options: {
@@ -427,164 +530,72 @@
                     maintainAspectRatio: false,
                     plugins: { 
                         legend: { display: false },
-                        tooltip: {
-                            backgroundColor: '#1e293b',
-                            titleColor: '#94a3b8',
-                            bodyColor: '#22c55e',
-                            bodyFont: { weight: 'bold' },
-                            borderColor: '#334155',
-                            borderWidth: 1,
-                            padding: 10,
-                            displayColors: false
-                        }
+                        tooltip: { backgroundColor: '#0b0f19', borderColor: '#1f293d', borderWidth: 1, padding: 12 }
                     },
                     scales: {
-                        y: { grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: '#94a3b8', font: { size: 10 } } },
-                        x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 10 } } }
+                        y: { grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: '#64748b' } },
+                        x: { grid: { display: false }, ticks: { color: '#64748b' } }
                     }
                 }
             });
         }
 
-        // --- Admin Authentication Security ---
-        function toggleAdminMode() {
-            if (!isAdmin) {
-                let pass = prompt("Admin Password ကို ရိုက်ထည့်ပါ -");
-                if (pass !== null) {
-                    pass = pass.trim();
-                    if (pass === ADMIN_PASSWORD || Number(pass) === 205428) {
-                        isAdmin = true;
-                        alert("Admin အဖြစ် ဝင်ရောက်မှု အောင်မြင်ပါသည်။");
-                        
-                        document.getElementById('adminBtn').classList.replace('bg-slate-800', 'bg-emerald-500');
-                        document.getElementById('adminBtn').classList.replace('text-slate-300', 'text-slate-950');
-                        document.getElementById('lockIcon').innerText = "🔓";
-                        document.getElementById('adminBtnText').innerText = "Admin ဝင်ထားသည်";
-                        
-                        if(!isViewingArchive) document.getElementById('adminFormCard').classList.remove('hidden');
-                        document.getElementById('sessionCtrlBtn').classList.remove('hidden');
-                        document.getElementById('visitorNotice').classList.add('hidden');
-                        
-                        document.querySelectorAll('.admin-action').forEach(el => el.classList.remove('hidden'));
-                        document.querySelectorAll('.archive-delete-btn').forEach(el => el.classList.remove('hidden'));
-                    } else {
-                        alert("လျှို့ဝှက်နံပါတ် မှားယွင်းနေပါသည်။");
-                    }
-                }
-            } else {
-                isAdmin = false;
-                document.getElementById('adminBtn').classList.replace('bg-emerald-500', 'bg-slate-800');
-                document.getElementById('adminBtn').classList.replace('text-slate-950', 'text-slate-300');
-                document.getElementById('lockIcon').innerText = "🔒";
-                document.getElementById('adminBtnText').innerText = "Admin ဝင်မည်";
-                
-                document.getElementById('adminFormCard').classList.add('hidden');
-                document.getElementById('sessionCtrlBtn').classList.add('hidden');
-                document.getElementById('visitorNotice').classList.remove('hidden');
-                
-                document.querySelectorAll('.admin-action').forEach(el => el.classList.add('hidden'));
-                document.querySelectorAll('.archive-delete-btn').forEach(el => el.classList.add('hidden'));
-            }
-        }
-
-        // --- Archive Control System (Close Active & Pack File) ---
-        function toggleSession() {
-            if (!isAdmin) return;
-            if (activeExpenses.length === 0) {
-                alert("ပိတ်သိမ်းရန် လက်ရှိစာရင်းထဲတွင် မည်သည့်ဒေတာမှ မရှိသေးပါ။");
-                return;
-            }
-
-            const archiveName = prompt("ဤစာရင်းကို ပိတ်သိမ်းရန် ဖိုင်အမည် ပေးပါ:\n(ဥပမာ - ဇူလိုင်လ စာရင်း၊ ပထမပတ် စာရင်း)");
-            if (!archiveName || archiveName.trim() === "") {
-                alert("ဖိုင်အမည် မထည့်သွင်းပါက စာရင်းပိတ်၍မရပါ။");
-                return;
-            }
-
-            if (confirm(`လက်ရှိဒေတာများကို "${archiveName}" အဖြစ် သိမ်းဆည်းပြီး စာရင်းသစ် ပြန်ဖွင့်ရန် သေချာပါသလား?`)) {
-                const archiveRef = db.ref('archives').push();
-                const archiveDataObj = {};
-                
-                activeExpenses.forEach(item => {
-                    archiveDataObj[item.id] = {
-                        date: item.date,
-                        title: item.title,
-                        amount: item.amount
-                    };
-                });
-
-                archiveRef.set({
-                    name: archiveName.trim(),
-                    dateCreated: new Date().toISOString(),
-                    data: archiveDataObj
-                }).then(() => {
-                    db.ref('expenses').remove().then(() => {
-                        alert(`လက်ရှိစာရင်းကို "${archiveName}" အဖြစ် ပိတ်သိမ်းသိမ်းဆည်းပြီး စာရင်းသစ်တစ်ခု အောင်မြင်စွာ ဖွင့်လိုက်ပါပြီ။`);
-                        loadActiveSession();
-                    });
-                }).catch(err => {
-                    alert("အမှားတစ်ခု ဖြစ်ပွားခဲ့သည်- " + err.message);
-                });
-            }
-        }
-
-        // --- Write Input Action ---
         function saveExpense(e) {
             e.preventDefault();
-            if (!isAdmin) return alert("Admin သာလျှင် စာရင်းသွင်းခွင့်ရှိသည်။");
-            if (isViewingArchive) return alert("စာရင်းဟောင်းများကို ကြည့်ရှုနေစဉ် စာရင်းအသစ် ထည့်၍မရပါ။ လတ်တလောစာရင်းသို့ အရင်ပြန်သွားပါ။");
+            if (!isAdmin) return;
 
             const date = document.getElementById('expDate').value;
             const title = document.getElementById('expTitle').value;
             const amount = document.getElementById('expAmount').value;
 
-            if (!date || !title || !amount) return;
-
-            db.ref('expenses').push({
-                date: date,
-                title: title,
-                amount: Number(amount)
-            }).then(() => {
+            db.ref('expenses').push({ date: date, title: title, amount: Number(amount) }).then(() => {
                 document.getElementById('expTitle').value = '';
                 document.getElementById('expAmount').value = '';
-                document.getElementById('expDate').valueAsDate = new Date();
+                switchView('dashboard-view');
             });
         }
 
-        // --- Destructive Actions (Delete Single Record / Delete Whole Folder Archive) ---
-        // 1. Delete an item from either Active session or Inner Archive folder
         function deleteExpense(id) {
-            if (!isAdmin) return alert("Admin သာလျှင် ဖျက်ပိုင်ခွင့်ရှိသည်။");
-            
-            if (confirm("ဤအသုံးစရိတ်ကို ဖျက်ရန် သေချာပါသလား?")) {
+            if (!isAdmin) return;
+            if (confirm("ဤမှတ်တမ်းကို ဇယားထဲမှ လုံးဝဖျက်ပစ်ရန် သေချာပါသလား?")) {
                 if (isViewingArchive && currentArchiveKey) {
-                    // Delete dynamic sub-record from specific history folder path
-                    db.ref(`archives/${currentArchiveKey}/data/${id}`).remove()
-                        .then(() => {
-                            alert("စာရင်းဟောင်းထဲမှ ဒေတာကို အောင်မြင်စွာ ဖျက်လိုက်ပါပြီ။");
-                        });
+                    db.ref(`archives/${currentArchiveKey}/data/${id}`).remove();
                 } else {
-                    // Delete from active session
                     db.ref('expenses/' + id).remove();
                 }
             }
         }
 
-        // 2. Delete Entire Archive Folder node
-        function deleteArchiveFolder(archiveKey, archiveName) {
-            if (!isAdmin) return alert("Admin သာလျှင် စာရင်းဟောင်းဖိုင်များကို ဖျက်ပိုင်ခွင့်ရှိသည်။");
-            
-            if (confirm(`"${archiveName}" ဖိုင်တစ်ခုလုံးနှင့် ၎င်းအောက်ရှိ စာရင်းမှတ်တမ်းအားလုံးကို လုံးဝဖျက်ပစ်ရန် သေချာပါသလား?\n(မှတ်ချက် - ပြန်လည်ရယူ၍ မရနိုင်ပါ)`)) {
-                db.ref(`archives/${archiveKey}`).remove()
-                    .then(() => {
-                        alert(`"${archiveName}" ဖိုင်ကို အောင်မြင်စွာ ဖျက်ဆီးပြီးပါပြီ။`);
-                        if (currentArchiveKey === archiveKey) {
-                            loadActiveSession();
-                        }
-                    }).catch(err => {
-                        alert("ဖျက်ဆီးရာတွင် အမှားအယွင်းရှိခဲ့သည် - " + err.message);
-                    });
+        function deleteArchiveFolder(key, name) {
+            if (!isAdmin) return;
+            if (confirm(`"${name}" ဖိုင်တွဲတစ်ခုလုံးကို အပြီးတိုင်ဖျက်ဆီးပစ်ရန် သေချာပါသလား?`)) {
+                db.ref(`archives/${key}`).remove().then(() => {
+                    if(currentArchiveKey === key) loadActiveSession();
+                });
             }
+        }
+
+        function toggleSession() {
+            if (!isAdmin || activeExpenses.length === 0) return;
+            const archiveName = prompt("ဤစာရင်းပိတ်သိမ်းမှုကို မှတ်သားရန် ဖိုင်ခေါင်းစဉ် ပေးပါ -");
+            if (!archiveName || archiveName.trim() === "") return;
+
+            const archiveRef = db.ref('archives').push();
+            const archiveDataObj = {};
+            activeExpenses.forEach(item => {
+                archiveDataObj[item.id] = { date: item.date, title: item.title, amount: item.amount };
+            });
+
+            archiveRef.set({
+                name: archiveName.trim(),
+                dateCreated: new Date().toISOString(),
+                data: archiveDataObj
+            }).then(() => {
+                db.ref('expenses').remove().then(() => {
+                    loadActiveSession();
+                    switchView('archive-view');
+                });
+            });
         }
     </script>
 </body>
